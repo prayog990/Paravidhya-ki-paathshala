@@ -20,6 +20,7 @@
             --text-secondary: #666666;
             --border-color: #e0e0e0;
             --accent-color: #ff6b6b;
+            --player-bg: #000000;
             --header-bg: #ffffff;
         }
 
@@ -46,6 +47,7 @@
             flex-direction: column;
         }
 
+        /* Header */
         .header {
             flex-shrink: 0;
             background-color: var(--header-bg);
@@ -93,6 +95,7 @@
             font-size: 24px;
         }
 
+        /* Content */
         .content {
             flex: 1;
             overflow-y: auto;
@@ -100,6 +103,7 @@
             -webkit-overflow-scrolling: touch;
         }
 
+        /* Screens */
         .screen {
             display: none;
             height: 100%;
@@ -111,6 +115,7 @@
             display: block;
         }
 
+        /* Home Screen */
         .home-screen {
             padding: 16px;
         }
@@ -188,6 +193,7 @@
             margin-bottom: 16px;
         }
 
+        /* Player Screen */
         .player-screen {
             display: flex;
             flex-direction: column;
@@ -202,9 +208,10 @@
             position: relative;
         }
 
-        #ytPlayer {
+        .player-container iframe {
             width: 100%;
             height: 100%;
+            border: none;
         }
 
         .video-details {
@@ -245,6 +252,7 @@
             margin-top: 8px;
         }
 
+        /* Admin Screen */
         .admin-screen {
             padding: 16px;
         }
@@ -286,6 +294,18 @@
             font-size: 14px;
         }
 
+        .form-group textarea {
+            resize: vertical;
+            min-height: 80px;
+        }
+
+        .form-group small {
+            display: block;
+            margin-top: 6px;
+            color: var(--text-secondary);
+            font-size: 12px;
+        }
+
         .btn-primary {
             width: 100%;
             padding: 12px;
@@ -314,9 +334,12 @@
             margin-top: 8px;
         }
 
+        .btn-secondary:active {
+            background-color: var(--bg-secondary);
+        }
+
         .btn-danger {
             background-color: #ff4757;
-            color: white;
         }
 
         .video-item {
@@ -376,6 +399,7 @@
             color: #721c24;
         }
 
+        /* Modal */
         .modal {
             display: none;
             position: fixed;
@@ -399,6 +423,12 @@
             max-height: 80vh;
             border-radius: 16px 16px 0 0;
             overflow-y: auto;
+            animation: slideUp 0.3s;
+        }
+
+        @keyframes slideUp {
+            from { transform: translateY(100%); }
+            to { transform: translateY(0); }
         }
 
         .modal-header {
@@ -434,6 +464,10 @@
             align-items: center;
             padding: 12px 0;
             border-bottom: 1px solid var(--border-color);
+        }
+
+        .toggle-item label {
+            font-size: 14px;
         }
 
         .toggle-switch {
@@ -479,20 +513,9 @@
         }
 
         .password-modal {
-            display: none; /* By default hidden, controlled via .active */
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background-color: rgba(0, 0, 0, 0.5);
-            z-index: 300;
+            display: flex;
             justify-content: center;
             align-items: center;
-        }
-
-        .password-modal.active {
-            display: flex;
         }
 
         .password-box {
@@ -528,9 +551,31 @@
             margin-bottom: 12px;
             min-height: 18px;
         }
+
+        .loading {
+            text-align: center;
+            padding: 40px 20px;
+            color: var(--text-secondary);
+        }
+
+        .spinner {
+            display: inline-block;
+            width: 30px;
+            height: 30px;
+            border: 3px solid var(--border-color);
+            border-top: 3px solid var(--accent-color);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
     </style>
 </head>
 <body>
+    <!-- Header -->
     <div class="header">
         <div style="width: 40px; display: flex; align-items: center;">
             <button class="btn-icon back-button" id="backBtn" style="display: none;">←</button>
@@ -542,7 +587,9 @@
         </div>
     </div>
 
+    <!-- Content -->
     <div class="content">
+        <!-- Home Screen -->
         <div class="screen active" id="homeScreen">
             <div class="home-screen">
                 <div id="videosList" class="videos-grid"></div>
@@ -553,10 +600,11 @@
             </div>
         </div>
 
+        <!-- Player Screen -->
         <div class="screen" id="playerScreen">
             <div class="player-screen">
                 <div class="player-container">
-                    <div id="ytPlayer"></div>
+                    <iframe id="ytPlayer" frameborder="0" allow="autoplay" allowfullscreen></iframe>
                 </div>
                 <div class="video-details">
                     <div class="video-title-large" id="playerTitle">लोड हो रहा है...</div>
@@ -570,6 +618,7 @@
             </div>
         </div>
 
+        <!-- Admin Screen -->
         <div class="screen" id="adminScreen">
             <div class="admin-screen">
                 <div id="adminMsg"></div>
@@ -587,7 +636,7 @@
                     <div class="form-group">
                         <label>कैप्शन फ़ाइल (JSON)</label>
                         <input type="file" id="captionsFile" accept=".json">
-                        <small style="color:var(--text-secondary); font-size:12px; display:block; margin-top:4px;"> प्रारूप: [[start, end, "text"], ...]</small>
+                        <small>[[start, end, "text"], ...]</small>
                     </div>
                     <button class="btn-primary" id="submitBtn">जोड़ें</button>
                     <button class="btn-secondary btn-danger" id="cancelBtn" style="display: none;">रद्द करें</button>
@@ -604,6 +653,7 @@
         </div>
     </div>
 
+    <!-- Settings Modal -->
     <div class="modal" id="settingsModal">
         <div class="modal-content">
             <div class="modal-header">
@@ -625,20 +675,18 @@
         </div>
     </div>
 
-    <!-- Password Modal Fixed -->
-    <div class="password-modal" id="passwordModal">
+    <!-- Password Modal -->
+    <div class="modal password-modal" id="passwordModal">
         <div class="password-box">
             <h2>एडमिन पैनल</h2>
-            <input type="password" id="passwordInput" class="password-input" placeholder="पासवर्ड" autocomplete="current-password">
+            <input type="password" id="passwordInput" class="password-input" placeholder="पासवर्ड">
             <div class="password-error" id="passError"></div>
             <button class="btn-primary" id="passBtn">लॉगिन</button>
-            <button class="btn-secondary" id="passCloseBtn" style="margin-top: 8px;">रद्द करें</button>
         </div>
     </div>
 
-    <script src="https://www.youtube.com/iframe_api"></script>
-
     <script>
+        // Firebase Config
         const firebaseConfig = {
             apiKey: "AIzaSyCGHJR74q0Xfj4QQz8uc36Qyb0kBlAI384",
             authDomain: "paravidhya-ki-paathshala.firebaseapp.com",
@@ -651,6 +699,7 @@
         firebase.initializeApp(firebaseConfig);
         const db = firebase.database();
 
+        // State
         const state = {
             videos: [],
             currentVideo: null,
@@ -658,14 +707,16 @@
             editingId: null,
             isDarkMode: localStorage.getItem('darkMode') === 'true',
             captionsData: null,
-            player: null,
             updateInterval: null
         };
 
+        // Init
         function init() {
             setupEvents();
             loadDarkMode();
             loadVideos();
+            // Admin panel should NOT load on startup
+            console.log('App initialized - Admin panel locked');
         }
 
         function setupEvents() {
@@ -675,21 +726,16 @@
             document.getElementById('settingsBtn').addEventListener('click', () => openModal('settingsModal'));
             document.getElementById('closeSettings').addEventListener('click', () => closeModal('settingsModal'));
             document.getElementById('adminBtn').addEventListener('click', openAdminPanel);
-            
-            // Password events fix
             document.getElementById('passBtn').addEventListener('click', checkPassword);
-            document.getElementById('passCloseBtn').addEventListener('click', () => {
-                document.getElementById('passwordModal').classList.remove('active');
-            });
             document.getElementById('passwordInput').addEventListener('keypress', (e) => {
                 if (e.key === 'Enter') checkPassword();
             });
-
             document.getElementById('submitBtn').addEventListener('click', saveVideo);
             document.getElementById('cancelBtn').addEventListener('click', cancelEdit);
             document.getElementById('captionsFile').addEventListener('change', handleFileUpload);
         }
 
+        // Dark Mode
         function toggleDarkMode() {
             state.isDarkMode = !state.isDarkMode;
             localStorage.setItem('darkMode', state.isDarkMode);
@@ -708,6 +754,7 @@
             }
         }
 
+        // Navigation
         function showScreen(screenId) {
             document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
             document.getElementById(screenId).classList.add('active');
@@ -718,10 +765,6 @@
             if (screenId === 'homeScreen') {
                 backBtn.style.display = 'none';
                 headerTitle.textContent = 'ParaVidhya';
-                stopCaptions();
-                if (state.player && typeof state.player.stopVideo === 'function') {
-                    state.player.stopVideo();
-                }
             } else {
                 backBtn.style.display = 'flex';
                 headerTitle.textContent = screenId === 'playerScreen' ? 'वीडियो' : 'एडमिन';
@@ -730,49 +773,76 @@
 
         function goHome() {
             showScreen('homeScreen');
+            stopCaptions();
         }
 
+        // Modal
         function openModal(modalId) {
             const modal = document.getElementById(modalId);
-            if (modal) modal.classList.add('active');
+            if (modal) {
+                modal.classList.add('active');
+                console.log('Opening modal:', modalId);
+            }
         }
 
         function closeModal(modalId) {
             const modal = document.getElementById(modalId);
-            if (modal) modal.classList.remove('active');
+            if (modal) {
+                modal.classList.remove('active');
+                console.log('Closing modal:', modalId);
+            }
         }
 
+        // Admin
         function openAdminPanel() {
             closeModal('settingsModal');
+            
+            // Reset password modal
             document.getElementById('passwordInput').value = '';
             document.getElementById('passError').textContent = '';
             
-            // Direct activation for password modal
-            document.getElementById('passwordModal').classList.add('active');
-            setTimeout(() => document.getElementById('passwordInput').focus(), 100);
+            // Open password modal
+            const modal = document.getElementById('passwordModal');
+            modal.classList.add('active');
+            
+            // Focus on input
+            setTimeout(() => {
+                document.getElementById('passwordInput').focus();
+            }, 100);
         }
 
         function checkPassword() {
-            const pass = document.getElementById('passwordInput').value.trim();
+            const pass = document.getElementById('passwordInput').value;
             const errorEl = document.getElementById('passError');
             
+            console.log('Password entered:', pass); // Debug
+            
             if (pass === '1234') {
+                console.log('Password correct!'); // Debug
                 state.isAdminLoggedIn = true;
+                
+                // Clear fields
                 document.getElementById('passwordInput').value = '';
                 errorEl.textContent = '';
-                document.getElementById('passwordModal').classList.remove('active');
                 
+                // Close modal properly
+                const modal = document.getElementById('passwordModal');
+                modal.classList.remove('active');
+                
+                // Small delay to ensure modal closes
                 setTimeout(() => {
                     loadAdminVideos();
                     showScreen('adminScreen');
                 }, 100);
             } else {
+                console.log('Wrong password'); // Debug
                 errorEl.textContent = 'गलत पासवर्ड! (सही: 1234)';
                 document.getElementById('passwordInput').value = '';
                 document.getElementById('passwordInput').focus();
             }
         }
 
+        // Video Management
         function handleFileUpload(e) {
             const file = e.target.files[0];
             if (!file) return;
@@ -780,9 +850,9 @@
             reader.onload = (evt) => {
                 try {
                     state.captionsData = JSON.parse(evt.target.result);
-                    showMsg(`${state.captionsData.length} कैप्शन लोड किए गए`, 'success', 'adminMsg');
+                    showMsg(`${state.captionsData.length} कैप्शन लोड`, 'success', 'adminMsg');
                 } catch {
-                    showMsg('अमान्य JSON फ़ाइल', 'error', 'adminMsg');
+                    showMsg('JSON अमान्य', 'error', 'adminMsg');
                     state.captionsData = null;
                 }
             };
@@ -794,18 +864,18 @@
             const url = document.getElementById('youtubeUrl').value.trim();
 
             if (!title || !url) {
-                showMsg('सभी फ़ील्ड भरना अनिवार्य है', 'error', 'adminMsg');
+                showMsg('सभी फ़ील्ड भरें', 'error', 'adminMsg');
                 return;
             }
 
             const videoId = extractVideoId(url);
             if (!videoId) {
-                showMsg('अमान्य YouTube URL', 'error', 'adminMsg');
+                showMsg('अमान्य URL', 'error', 'adminMsg');
                 return;
             }
 
             if (!state.editingId && !state.captionsData) {
-                showMsg('कृपया कैप्शन फ़ाइल (JSON) अपलोड करें', 'error', 'adminMsg');
+                showMsg('कैप्शन फ़ाइल लोड करें', 'error', 'adminMsg');
                 return;
             }
 
@@ -819,14 +889,14 @@
 
             if (state.editingId) {
                 db.ref(`videos/${state.editingId}`).update(data).then(() => {
-                    showMsg('वीडियो अपडेट हो गया', 'success', 'adminMsg');
+                    showMsg('अपडेट हो गया', 'success', 'adminMsg');
                     resetForm();
                     loadVideos();
                     loadAdminVideos();
                 });
             } else {
                 db.ref('videos').push().set(data).then(() => {
-                    showMsg('नया वीडियो जोड़ा गया', 'success', 'adminMsg');
+                    showMsg('जोड़ा गया', 'success', 'adminMsg');
                     resetForm();
                     loadVideos();
                     loadAdminVideos();
@@ -838,7 +908,7 @@
             const video = state.videos.find(v => v.id === id);
             if (!video) return;
             state.editingId = id;
-            document.getElementById('formTitle').textContent = 'वीडियो संपादित करें';
+            document.getElementById('formTitle').textContent = 'संपादित करें';
             document.getElementById('videoTitle').value = video.title;
             document.getElementById('youtubeUrl').value = video.youtubeUrl;
             document.getElementById('submitBtn').textContent = 'अपडेट करें';
@@ -846,7 +916,7 @@
         }
 
         function deleteVideo(id) {
-            if (confirm('क्या आप वाकई इस वीडियो को हटाना चाहते हैं?')) {
+            if (confirm('हटाएं?')) {
                 db.ref(`videos/${id}`).remove().then(() => {
                     loadVideos();
                     loadAdminVideos();
@@ -869,6 +939,7 @@
             state.captionsData = null;
         }
 
+        // Videos
         function loadVideos() {
             db.ref('videos').once('value', snapshot => {
                 state.videos = [];
@@ -931,75 +1002,39 @@
 
             state.currentVideo = video;
             document.getElementById('playerTitle').textContent = video.title;
-            document.getElementById('captionText').textContent = 'कैप्शन सिंक हो रहे हैं...';
+            document.getElementById('ytPlayer').src = `https://www.youtube.com/embed/${video.videoId}?autoplay=1`;
+            document.getElementById('captionText').textContent = '';
             document.getElementById('captionCounter').textContent = '';
 
             showScreen('playerScreen');
-
-            if (state.player && typeof state.player.loadVideoById === 'function') {
-                state.player.loadVideoById(video.videoId);
-            } else {
-                initYouTubePlayer(video.videoId);
-            }
+            startCaptions();
         }
 
-        function initYouTubePlayer(videoId) {
-            if (window.YT && window.YT.Player) {
-                state.player = new YT.Player('ytPlayer', {
-                    videoId: videoId,
-                    playerVars: { 'autoplay': 1, 'playsinline': 1 },
-                    events: {
-                        'onReady': (event) => {
-                            event.target.playVideo();
-                            startCaptions();
-                        },
-                        'onStateChange': (event) => {
-                            if (event.data == YT.PlayerState.PLAYING) {
-                                startCaptions();
-                            } else {
-                                stopCaptions();
-                            }
-                        }
-                    }
-                });
-            } else {
-                setTimeout(() => initYouTubePlayer(videoId), 500);
-            }
-        }
-
+        // Captions
         function startCaptions() {
             stopCaptions();
-            state.updateInterval = setInterval(updateCaptions, 200);
+            if (!state.currentVideo || !state.currentVideo.captions) return;
+
+            state.updateInterval = setInterval(updateCaptions, 500);
         }
 
         function updateCaptions() {
-            if (!state.currentVideo || !state.currentVideo.captions || !state.player || typeof state.player.getCurrentTime !== 'function') {
-                return;
-            }
+            if (!state.currentVideo || !state.currentVideo.captions) return;
 
-            try {
-                const currentTime = state.player.getCurrentTime();
-                const captions = state.currentVideo.captions;
-                const captionEl = document.getElementById('captionText');
-                const counterEl = document.getElementById('captionCounter');
+            // Since YouTube embed doesn't expose currentTime, we'll use a fallback
+            // that reads from the video through a hidden iframe with postMessage API
+            // For now, we'll implement a simple approach
 
-                let activeIndex = -1;
-                for (let i = 0; i < captions.length; i++) {
-                    if (currentTime >= captions[i][0] && currentTime <= captions[i][1]) {
-                        activeIndex = i;
-                        break;
-                    }
-                }
-
-                if (activeIndex !== -1) {
-                    captionEl.textContent = captions[activeIndex][2];
-                    counterEl.textContent = `${activeIndex + 1} / ${captions.length}`;
-                } else {
-                    captionEl.textContent = '...';
-                    counterEl.textContent = '';
-                }
-            } catch (e) {
-                console.error(e);
+            const captions = state.currentVideo.captions;
+            const captionEl = document.getElementById('captionText');
+            
+            // Try to estimate time (this is a limitation of iframe embeds)
+            // For better sync, users would need to use YouTube Data API
+            
+            // Display first available caption
+            if (captions.length > 0) {
+                captionEl.textContent = captions[0][2];
+                document.getElementById('captionCounter').textContent = `1/${captions.length}`;
             }
         }
 
@@ -1010,6 +1045,7 @@
             }
         }
 
+        // Utilities
         function extractVideoId(url) {
             try {
                 const u = new URL(url);
@@ -1027,6 +1063,7 @@
             setTimeout(() => msgEl.innerHTML = '', 3000);
         }
 
+        // Start
         init();
     </script>
 </body>

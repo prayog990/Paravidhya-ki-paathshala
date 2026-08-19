@@ -20,8 +20,6 @@
             --text-secondary: #666666;
             --border-color: #e0e0e0;
             --accent-color: #ff6b6b;
-            --player-bg: #000000;
-            --header-bg: #ffffff;
         }
 
         body.dark-mode {
@@ -30,14 +28,12 @@
             --text-primary: #ffffff;
             --text-secondary: #b0b0b0;
             --border-color: #333333;
-            --header-bg: #1e1e1e;
         }
 
         html, body {
             font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
             background-color: var(--bg-primary);
             color: var(--text-primary);
-            transition: background-color 0.3s, color 0.3s;
             height: 100%;
             overflow: hidden;
         }
@@ -47,28 +43,24 @@
             flex-direction: column;
         }
 
-        /* Header */
         .header {
             flex-shrink: 0;
-            background-color: var(--header-bg);
+            background-color: var(--bg-primary);
             border-bottom: 1px solid var(--border-color);
             padding: 12px 16px;
             display: flex;
             justify-content: space-between;
             align-items: center;
-            z-index: 100;
         }
 
         .header-title {
             font-size: 18px;
             font-weight: 600;
-            flex: 1;
         }
 
         .header-controls {
             display: flex;
             gap: 12px;
-            align-items: center;
         }
 
         .btn-icon {
@@ -77,45 +69,29 @@
             border: none;
             background: none;
             cursor: pointer;
-            display: flex;
-            align-items: center;
-            justify-content: center;
             font-size: 20px;
             color: var(--text-primary);
             border-radius: 50%;
-            transition: background-color 0.2s;
         }
 
         .btn-icon:active {
             background-color: var(--bg-secondary);
         }
 
-        .back-button {
-            color: var(--accent-color);
-            font-size: 24px;
-        }
-
-        /* Content */
         .content {
             flex: 1;
             overflow-y: auto;
-            overflow-x: hidden;
             -webkit-overflow-scrolling: touch;
         }
 
-        /* Screens */
         .screen {
             display: none;
-            height: 100%;
-            overflow-y: auto;
-            -webkit-overflow-scrolling: touch;
         }
 
         .screen.active {
             display: block;
         }
 
-        /* Home Screen */
         .home-screen {
             padding: 16px;
         }
@@ -143,9 +119,6 @@
             aspect-ratio: 16/9;
             background-color: #000;
             position: relative;
-            display: flex;
-            align-items: center;
-            justify-content: center;
             overflow: hidden;
         }
 
@@ -164,7 +137,9 @@
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 20px;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
             color: white;
         }
 
@@ -175,7 +150,6 @@
         .video-title {
             font-size: 13px;
             font-weight: 500;
-            line-height: 1.3;
             display: -webkit-box;
             -webkit-line-clamp: 2;
             -webkit-box-orient: vertical;
@@ -188,12 +162,6 @@
             color: var(--text-secondary);
         }
 
-        .empty-icon {
-            font-size: 48px;
-            margin-bottom: 16px;
-        }
-
-        /* Player Screen */
         .player-screen {
             display: flex;
             flex-direction: column;
@@ -205,7 +173,6 @@
             width: 100%;
             aspect-ratio: 16/9;
             background-color: #000;
-            position: relative;
         }
 
         .player-container iframe {
@@ -231,28 +198,33 @@
             background-color: var(--bg-secondary);
             border-radius: 8px;
             padding: 16px;
-            min-height: 100px;
+            min-height: 80px;
             display: flex;
             align-items: center;
             justify-content: center;
-            margin-bottom: 16px;
+            text-align: center;
         }
 
         .caption-text {
             font-size: 15px;
             line-height: 1.6;
-            text-align: center;
-            word-wrap: break-word;
         }
 
-        .caption-counter {
-            font-size: 12px;
-            color: var(--text-secondary);
-            text-align: center;
-            margin-top: 8px;
+        .back-btn {
+            width: 40px;
+            height: 40px;
+            border: none;
+            background: none;
+            font-size: 24px;
+            color: var(--accent-color);
+            cursor: pointer;
+            display: none;
         }
 
-        /* Admin Screen */
+        .back-btn.show {
+            display: block;
+        }
+
         .admin-screen {
             padding: 16px;
         }
@@ -299,13 +271,6 @@
             min-height: 80px;
         }
 
-        .form-group small {
-            display: block;
-            margin-top: 6px;
-            color: var(--text-secondary);
-            font-size: 12px;
-        }
-
         .btn-primary {
             width: 100%;
             padding: 12px;
@@ -332,10 +297,6 @@
             font-size: 14px;
             cursor: pointer;
             margin-top: 8px;
-        }
-
-        .btn-secondary:active {
-            background-color: var(--bg-secondary);
         }
 
         .btn-danger {
@@ -399,8 +360,8 @@
             color: #721c24;
         }
 
-        /* Modal */
-        .modal {
+        /* Modal - Only Settings Modal */
+        .modal-overlay {
             display: none;
             position: fixed;
             top: 0;
@@ -408,12 +369,12 @@
             width: 100%;
             height: 100%;
             background-color: rgba(0, 0, 0, 0.5);
-            z-index: 200;
+            z-index: 999;
             justify-content: center;
             align-items: flex-end;
         }
 
-        .modal.active {
+        .modal-overlay.active {
             display: flex;
         }
 
@@ -423,6 +384,7 @@
             max-height: 80vh;
             border-radius: 16px 16px 0 0;
             overflow-y: auto;
+            padding: 20px;
             animation: slideUp 0.3s;
         }
 
@@ -435,19 +397,11 @@
             display: flex;
             justify-content: space-between;
             align-items: center;
-            padding: 16px;
-            border-bottom: 1px solid var(--border-color);
-            position: sticky;
-            top: 0;
-            background-color: var(--bg-primary);
+            margin-bottom: 20px;
         }
 
         .modal-header h2 {
             font-size: 16px;
-        }
-
-        .modal-body {
-            padding: 16px;
         }
 
         .close-btn {
@@ -464,10 +418,6 @@
             align-items: center;
             padding: 12px 0;
             border-bottom: 1px solid var(--border-color);
-        }
-
-        .toggle-item label {
-            font-size: 14px;
         }
 
         .toggle-switch {
@@ -512,18 +462,31 @@
             transform: translateX(22px);
         }
 
-        .password-modal {
-            display: flex;
+        /* Password Modal - Separate Overlay */
+        .password-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.7);
+            z-index: 1000;
             justify-content: center;
             align-items: center;
+            padding: 20px;
+        }
+
+        .password-overlay.active {
+            display: flex;
         }
 
         .password-box {
-            background-color: var(--bg-secondary);
+            background-color: var(--bg-primary);
             padding: 30px;
             border-radius: 12px;
-            width: 90%;
-            max-width: 300px;
+            width: 100%;
+            max-width: 320px;
             text-align: center;
         }
 
@@ -538,7 +501,7 @@
             margin-bottom: 12px;
             border: 1px solid var(--border-color);
             border-radius: 6px;
-            background-color: var(--bg-primary);
+            background-color: var(--bg-secondary);
             color: var(--text-primary);
             font-size: 16px;
             text-align: center;
@@ -551,35 +514,12 @@
             margin-bottom: 12px;
             min-height: 18px;
         }
-
-        .loading {
-            text-align: center;
-            padding: 40px 20px;
-            color: var(--text-secondary);
-        }
-
-        .spinner {
-            display: inline-block;
-            width: 30px;
-            height: 30px;
-            border: 3px solid var(--border-color);
-            border-top: 3px solid var(--accent-color);
-            border-radius: 50%;
-            animation: spin 1s linear infinite;
-        }
-
-        @keyframes spin {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
-        }
     </style>
 </head>
 <body>
     <!-- Header -->
     <div class="header">
-        <div style="width: 40px; display: flex; align-items: center;">
-            <button class="btn-icon back-button" id="backBtn" style="display: none;">←</button>
-        </div>
+        <button class="back-btn" id="backBtn">←</button>
         <div class="header-title" id="headerTitle">ParaVidhya</div>
         <div class="header-controls">
             <button class="btn-icon" id="darkModeBtn">🌙</button>
@@ -594,8 +534,7 @@
             <div class="home-screen">
                 <div id="videosList" class="videos-grid"></div>
                 <div id="emptyState" class="empty-state" style="display: none;">
-                    <div class="empty-icon">🎬</div>
-                    <p>कोई वीडियो नहीं</p>
+                    <p>🎬 कोई वीडियो नहीं</p>
                 </div>
             </div>
         </div>
@@ -609,10 +548,7 @@
                 <div class="video-details">
                     <div class="video-title-large" id="playerTitle">लोड हो रहा है...</div>
                     <div class="captions-box">
-                        <div>
-                            <div class="caption-text" id="captionText">कैप्शन यहाँ दिखेंगे...</div>
-                            <div class="caption-counter" id="captionCounter"></div>
-                        </div>
+                        <div class="caption-text" id="captionText">कैप्शन यहाँ दिखेंगे...</div>
                     </div>
                 </div>
             </div>
@@ -636,14 +572,14 @@
                     <div class="form-group">
                         <label>कैप्शन फ़ाइल (JSON)</label>
                         <input type="file" id="captionsFile" accept=".json">
-                        <small>[[start, end, "text"], ...]</small>
+                        <small style="color: var(--text-secondary); display: block; margin-top: 6px;">[[start, end, "text"], ...]</small>
                     </div>
                     <button class="btn-primary" id="submitBtn">जोड़ें</button>
                     <button class="btn-secondary btn-danger" id="cancelBtn" style="display: none;">रद्द करें</button>
                 </div>
 
                 <div class="form-section">
-                    <h3>वीडियो</h3>
+                    <h3>सभी वीडियो</h3>
                     <div id="videosList2"></div>
                     <div id="emptyVideos" class="empty-state" style="display: none;">
                         <p>कोई वीडियो नहीं</p>
@@ -653,35 +589,33 @@
         </div>
     </div>
 
-    <!-- Settings Modal -->
-    <div class="modal" id="settingsModal">
+    <!-- Settings Modal (Bottom Sheet) -->
+    <div class="modal-overlay" id="settingsModal">
         <div class="modal-content">
             <div class="modal-header">
                 <h2>सेटिंग्स</h2>
                 <button class="close-btn" id="closeSettings">✕</button>
             </div>
-            <div class="modal-body">
-                <div class="toggle-item">
-                    <label>डार्क मोड</label>
-                    <label class="toggle-switch">
-                        <input type="checkbox" id="darkToggle">
-                        <span class="toggle-slider"></span>
-                    </label>
-                </div>
-                <div class="form-group" style="margin-top: 16px;">
-                    <button class="btn-primary" id="adminBtn">एडमिन पैनल</button>
-                </div>
+            <div class="toggle-item">
+                <label>डार्क मोड</label>
+                <label class="toggle-switch">
+                    <input type="checkbox" id="darkToggle">
+                    <span class="toggle-slider"></span>
+                </label>
+            </div>
+            <div class="form-group" style="margin-top: 16px;">
+                <button class="btn-primary" id="adminBtn">एडमिन पैनल खोलें</button>
             </div>
         </div>
     </div>
 
-    <!-- Password Modal -->
-    <div class="modal password-modal" id="passwordModal">
+    <!-- Password Modal (Center Overlay) -->
+    <div class="password-overlay" id="passwordOverlay">
         <div class="password-box">
             <h2>एडमिन पैनल</h2>
             <input type="password" id="passwordInput" class="password-input" placeholder="पासवर्ड">
             <div class="password-error" id="passError"></div>
-            <button class="btn-primary" id="passBtn">लॉगिन</button>
+            <button class="btn-primary" id="passBtn">लॉगिन करें</button>
         </div>
     </div>
 
@@ -706,8 +640,7 @@
             isAdminLoggedIn: false,
             editingId: null,
             isDarkMode: localStorage.getItem('darkMode') === 'true',
-            captionsData: null,
-            updateInterval: null
+            captionsData: null
         };
 
         // Init
@@ -715,17 +648,16 @@
             setupEvents();
             loadDarkMode();
             loadVideos();
-            // Admin panel should NOT load on startup
-            console.log('App initialized - Admin panel locked');
+            console.log('✅ App Initialized - Home screen visible');
         }
 
         function setupEvents() {
             document.getElementById('backBtn').addEventListener('click', goHome);
             document.getElementById('darkModeBtn').addEventListener('click', toggleDarkMode);
             document.getElementById('darkToggle').addEventListener('change', toggleDarkMode);
-            document.getElementById('settingsBtn').addEventListener('click', () => openModal('settingsModal'));
-            document.getElementById('closeSettings').addEventListener('click', () => closeModal('settingsModal'));
-            document.getElementById('adminBtn').addEventListener('click', openAdminPanel);
+            document.getElementById('settingsBtn').addEventListener('click', openSettings);
+            document.getElementById('closeSettings').addEventListener('click', closeSettings);
+            document.getElementById('adminBtn').addEventListener('click', openPasswordModal);
             document.getElementById('passBtn').addEventListener('click', checkPassword);
             document.getElementById('passwordInput').addEventListener('keypress', (e) => {
                 if (e.key === 'Enter') checkPassword();
@@ -763,86 +695,56 @@
             const headerTitle = document.getElementById('headerTitle');
 
             if (screenId === 'homeScreen') {
-                backBtn.style.display = 'none';
+                backBtn.classList.remove('show');
                 headerTitle.textContent = 'ParaVidhya';
             } else {
-                backBtn.style.display = 'flex';
+                backBtn.classList.add('show');
                 headerTitle.textContent = screenId === 'playerScreen' ? 'वीडियो' : 'एडमिन';
             }
         }
 
         function goHome() {
             showScreen('homeScreen');
-            stopCaptions();
         }
 
-        // Modal
-        function openModal(modalId) {
-            const modal = document.getElementById(modalId);
-            if (modal) {
-                modal.classList.add('active');
-                console.log('Opening modal:', modalId);
-            }
+        // Settings Modal
+        function openSettings() {
+            document.getElementById('settingsModal').classList.add('active');
         }
 
-        function closeModal(modalId) {
-            const modal = document.getElementById(modalId);
-            if (modal) {
-                modal.classList.remove('active');
-                console.log('Closing modal:', modalId);
-            }
+        function closeSettings() {
+            document.getElementById('settingsModal').classList.remove('active');
         }
 
-        // Admin
-        function openAdminPanel() {
-            closeModal('settingsModal');
-            
-            // Reset password modal
+        // Password Modal
+        function openPasswordModal() {
+            closeSettings();
+            document.getElementById('passwordOverlay').classList.add('active');
             document.getElementById('passwordInput').value = '';
             document.getElementById('passError').textContent = '';
-            
-            // Open password modal
-            const modal = document.getElementById('passwordModal');
-            modal.classList.add('active');
-            
-            // Focus on input
-            setTimeout(() => {
-                document.getElementById('passwordInput').focus();
-            }, 100);
+            setTimeout(() => document.getElementById('passwordInput').focus(), 100);
+        }
+
+        function closePasswordModal() {
+            document.getElementById('passwordOverlay').classList.remove('active');
         }
 
         function checkPassword() {
             const pass = document.getElementById('passwordInput').value;
-            const errorEl = document.getElementById('passError');
-            
-            console.log('Password entered:', pass); // Debug
             
             if (pass === '1234') {
-                console.log('Password correct!'); // Debug
                 state.isAdminLoggedIn = true;
-                
-                // Clear fields
-                document.getElementById('passwordInput').value = '';
-                errorEl.textContent = '';
-                
-                // Close modal properly
-                const modal = document.getElementById('passwordModal');
-                modal.classList.remove('active');
-                
-                // Small delay to ensure modal closes
-                setTimeout(() => {
-                    loadAdminVideos();
-                    showScreen('adminScreen');
-                }, 100);
+                closePasswordModal();
+                loadAdminVideos();
+                showScreen('adminScreen');
+                console.log('✅ Admin panel opened');
             } else {
-                console.log('Wrong password'); // Debug
-                errorEl.textContent = 'गलत पासवर्ड! (सही: 1234)';
+                document.getElementById('passError').textContent = 'गलत पासवर्ड';
                 document.getElementById('passwordInput').value = '';
-                document.getElementById('passwordInput').focus();
             }
         }
 
-        // Video Management
+        // Admin Functions
         function handleFileUpload(e) {
             const file = e.target.files[0];
             if (!file) return;
@@ -850,9 +752,9 @@
             reader.onload = (evt) => {
                 try {
                     state.captionsData = JSON.parse(evt.target.result);
-                    showMsg(`${state.captionsData.length} कैप्शन लोड`, 'success', 'adminMsg');
+                    showMsg(`${state.captionsData.length} कैप्शन लोड`, 'success');
                 } catch {
-                    showMsg('JSON अमान्य', 'error', 'adminMsg');
+                    showMsg('JSON अमान्य', 'error');
                     state.captionsData = null;
                 }
             };
@@ -864,18 +766,18 @@
             const url = document.getElementById('youtubeUrl').value.trim();
 
             if (!title || !url) {
-                showMsg('सभी फ़ील्ड भरें', 'error', 'adminMsg');
+                showMsg('सभी फ़ील्ड भरें', 'error');
                 return;
             }
 
             const videoId = extractVideoId(url);
             if (!videoId) {
-                showMsg('अमान्य URL', 'error', 'adminMsg');
+                showMsg('अमान्य URL', 'error');
                 return;
             }
 
             if (!state.editingId && !state.captionsData) {
-                showMsg('कैप्शन फ़ाइल लोड करें', 'error', 'adminMsg');
+                showMsg('कैप्शन फ़ाइल लोड करें', 'error');
                 return;
             }
 
@@ -889,14 +791,14 @@
 
             if (state.editingId) {
                 db.ref(`videos/${state.editingId}`).update(data).then(() => {
-                    showMsg('अपडेट हो गया', 'success', 'adminMsg');
+                    showMsg('अपडेट हो गया', 'success');
                     resetForm();
                     loadVideos();
                     loadAdminVideos();
                 });
             } else {
                 db.ref('videos').push().set(data).then(() => {
-                    showMsg('जोड़ा गया', 'success', 'adminMsg');
+                    showMsg('जोड़ा गया', 'success');
                     resetForm();
                     loadVideos();
                     loadAdminVideos();
@@ -939,17 +841,6 @@
             state.captionsData = null;
         }
 
-        // Videos
-        function loadVideos() {
-            db.ref('videos').once('value', snapshot => {
-                state.videos = [];
-                snapshot.forEach(child => {
-                    state.videos.push({ id: child.key, ...child.val() });
-                });
-                renderVideos();
-            });
-        }
-
         function loadAdminVideos() {
             const list = document.getElementById('videosList2');
             const empty = document.getElementById('emptyVideos');
@@ -970,6 +861,17 @@
                     </div>
                 </div>
             `).join('');
+        }
+
+        // Videos
+        function loadVideos() {
+            db.ref('videos').once('value', snapshot => {
+                state.videos = [];
+                snapshot.forEach(child => {
+                    state.videos.push({ id: child.key, ...child.val() });
+                });
+                renderVideos();
+            });
         }
 
         function renderVideos() {
@@ -1003,46 +905,9 @@
             state.currentVideo = video;
             document.getElementById('playerTitle').textContent = video.title;
             document.getElementById('ytPlayer').src = `https://www.youtube.com/embed/${video.videoId}?autoplay=1`;
-            document.getElementById('captionText').textContent = '';
-            document.getElementById('captionCounter').textContent = '';
+            document.getElementById('captionText').textContent = 'कैप्शन यहाँ दिखेंगे...';
 
             showScreen('playerScreen');
-            startCaptions();
-        }
-
-        // Captions
-        function startCaptions() {
-            stopCaptions();
-            if (!state.currentVideo || !state.currentVideo.captions) return;
-
-            state.updateInterval = setInterval(updateCaptions, 500);
-        }
-
-        function updateCaptions() {
-            if (!state.currentVideo || !state.currentVideo.captions) return;
-
-            // Since YouTube embed doesn't expose currentTime, we'll use a fallback
-            // that reads from the video through a hidden iframe with postMessage API
-            // For now, we'll implement a simple approach
-
-            const captions = state.currentVideo.captions;
-            const captionEl = document.getElementById('captionText');
-            
-            // Try to estimate time (this is a limitation of iframe embeds)
-            // For better sync, users would need to use YouTube Data API
-            
-            // Display first available caption
-            if (captions.length > 0) {
-                captionEl.textContent = captions[0][2];
-                document.getElementById('captionCounter').textContent = `1/${captions.length}`;
-            }
-        }
-
-        function stopCaptions() {
-            if (state.updateInterval) {
-                clearInterval(state.updateInterval);
-                state.updateInterval = null;
-            }
         }
 
         // Utilities
@@ -1057,8 +922,8 @@
             }
         }
 
-        function showMsg(msg, type, el) {
-            const msgEl = document.getElementById(el);
+        function showMsg(msg, type) {
+            const msgEl = document.getElementById('adminMsg');
             msgEl.innerHTML = `<div class="message ${type}">${msg}</div>`;
             setTimeout(() => msgEl.innerHTML = '', 3000);
         }

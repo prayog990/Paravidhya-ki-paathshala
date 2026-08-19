@@ -13,6 +13,12 @@
             box-sizing: border-box;
         }
 
+        html, body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            height: 100%;
+            overflow: hidden;
+        }
+
         :root {
             --bg-primary: #ffffff;
             --bg-secondary: #f5f5f5;
@@ -30,17 +36,12 @@
             --border-color: #333333;
         }
 
-        html, body {
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-            background-color: var(--bg-primary);
-            color: var(--text-primary);
-            height: 100%;
-            overflow: hidden;
-        }
-
         body {
             display: flex;
             flex-direction: column;
+            background-color: var(--bg-primary);
+            color: var(--text-primary);
+            transition: background-color 0.3s, color 0.3s;
         }
 
         .header {
@@ -51,11 +52,13 @@
             display: flex;
             justify-content: space-between;
             align-items: center;
+            height: 56px;
         }
 
         .header-title {
             font-size: 18px;
             font-weight: 600;
+            flex: 1;
         }
 
         .header-controls {
@@ -72,6 +75,12 @@
             font-size: 20px;
             color: var(--text-primary);
             border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: background-color 0.2s;
+            -webkit-user-select: none;
+            user-select: none;
         }
 
         .btn-icon:active {
@@ -86,14 +95,11 @@
 
         .screen {
             display: none;
+            padding: 16px;
         }
 
         .screen.active {
             display: block;
-        }
-
-        .home-screen {
-            padding: 16px;
         }
 
         .videos-grid {
@@ -119,7 +125,6 @@
             aspect-ratio: 16/9;
             background-color: #000;
             position: relative;
-            overflow: hidden;
         }
 
         .video-thumbnail img {
@@ -141,6 +146,7 @@
             left: 50%;
             transform: translate(-50%, -50%);
             color: white;
+            font-size: 18px;
         }
 
         .video-info {
@@ -162,10 +168,37 @@
             color: var(--text-secondary);
         }
 
+        .empty-icon {
+            font-size: 48px;
+            margin-bottom: 12px;
+        }
+
+        .loading {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100%;
+        }
+
+        .spinner {
+            width: 40px;
+            height: 40px;
+            border: 4px solid var(--border-color);
+            border-top: 4px solid var(--accent-color);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
         .player-screen {
             display: flex;
             flex-direction: column;
             height: 100%;
+            padding: 0;
         }
 
         .player-container {
@@ -181,36 +214,8 @@
             border: none;
         }
 
-        .video-details {
-            flex: 1;
-            overflow-y: auto;
-            padding: 16px;
-            -webkit-overflow-scrolling: touch;
-        }
-
-        .video-title-large {
-            font-size: 16px;
-            font-weight: 600;
-            margin-bottom: 12px;
-        }
-
-        .captions-box {
-            background-color: var(--bg-secondary);
-            border-radius: 8px;
-            padding: 16px;
-            min-height: 80px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            text-align: center;
-        }
-
-        .caption-text {
-            font-size: 15px;
-            line-height: 1.6;
-        }
-
         .back-btn {
+            display: none;
             width: 40px;
             height: 40px;
             border: none;
@@ -218,149 +223,14 @@
             font-size: 24px;
             color: var(--accent-color);
             cursor: pointer;
-            display: none;
         }
 
         .back-btn.show {
-            display: block;
-        }
-
-        .admin-screen {
-            padding: 16px;
-        }
-
-        .form-section {
-            background-color: var(--bg-secondary);
-            border-radius: 8px;
-            padding: 16px;
-            margin-bottom: 16px;
-        }
-
-        .form-section h3 {
-            font-size: 15px;
-            font-weight: 600;
-            margin-bottom: 12px;
-        }
-
-        .form-group {
-            margin-bottom: 12px;
-        }
-
-        .form-group label {
-            display: block;
-            font-size: 13px;
-            margin-bottom: 6px;
-            color: var(--text-secondary);
-            font-weight: 500;
-        }
-
-        .form-group input,
-        .form-group textarea {
-            width: 100%;
-            padding: 10px;
-            border: 1px solid var(--border-color);
-            border-radius: 6px;
-            background-color: var(--bg-primary);
-            color: var(--text-primary);
-            font-family: inherit;
-            font-size: 14px;
-        }
-
-        .form-group textarea {
-            resize: vertical;
-            min-height: 80px;
-        }
-
-        .btn-primary {
-            width: 100%;
-            padding: 12px;
-            background-color: var(--accent-color);
-            color: white;
-            border: none;
-            border-radius: 6px;
-            font-size: 14px;
-            font-weight: 600;
-            cursor: pointer;
-        }
-
-        .btn-primary:active {
-            opacity: 0.8;
-        }
-
-        .btn-secondary {
-            width: 100%;
-            padding: 10px;
-            background-color: transparent;
-            color: var(--text-primary);
-            border: 1px solid var(--border-color);
-            border-radius: 6px;
-            font-size: 14px;
-            cursor: pointer;
-            margin-top: 8px;
-        }
-
-        .btn-danger {
-            background-color: #ff4757;
-        }
-
-        .video-item {
-            background-color: var(--bg-primary);
-            padding: 12px;
-            border-radius: 6px;
-            margin-bottom: 8px;
             display: flex;
-            justify-content: space-between;
             align-items: center;
-            border: 1px solid var(--border-color);
+            justify-content: center;
         }
 
-        .video-item-title {
-            flex: 1;
-            font-size: 13px;
-        }
-
-        .video-item-actions {
-            display: flex;
-            gap: 6px;
-        }
-
-        .btn-small {
-            padding: 6px 10px;
-            font-size: 11px;
-            border: none;
-            border-radius: 4px;
-            cursor: pointer;
-            white-space: nowrap;
-        }
-
-        .btn-edit {
-            background-color: #3498db;
-            color: white;
-        }
-
-        .btn-delete {
-            background-color: #e74c3c;
-            color: white;
-        }
-
-        .message {
-            padding: 10px 12px;
-            border-radius: 6px;
-            margin-bottom: 12px;
-            font-size: 13px;
-        }
-
-        .message.success {
-            background-color: #d4edda;
-            color: #155724;
-        }
-
-        .message.error {
-            background-color: #f8d7da;
-            color: #721c24;
-        }
-
-        /* Modal - Only Settings Modal */
         .modal-overlay {
             display: none;
             position: fixed;
@@ -410,6 +280,12 @@
             font-size: 24px;
             cursor: pointer;
             color: var(--text-primary);
+            padding: 0;
+            width: 40px;
+            height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
         }
 
         .toggle-item {
@@ -462,7 +338,23 @@
             transform: translateX(22px);
         }
 
-        /* Password Modal - Separate Overlay */
+        .btn-primary {
+            width: 100%;
+            padding: 12px;
+            background-color: var(--accent-color);
+            color: white;
+            border: none;
+            border-radius: 6px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            margin-top: 16px;
+        }
+
+        .btn-primary:active {
+            opacity: 0.8;
+        }
+
         .password-overlay {
             display: none;
             position: fixed;
@@ -514,87 +406,218 @@
             margin-bottom: 12px;
             min-height: 18px;
         }
+
+        /* Admin Panel Styles */
+        .form-section {
+            background-color: var(--bg-secondary);
+            border-radius: 8px;
+            padding: 16px;
+            margin-bottom: 16px;
+        }
+
+        .form-section h3 {
+            font-size: 15px;
+            font-weight: 600;
+            margin-bottom: 12px;
+        }
+
+        .form-group {
+            margin-bottom: 12px;
+        }
+
+        .form-group label {
+            display: block;
+            font-size: 13px;
+            margin-bottom: 6px;
+            color: var(--text-secondary);
+            font-weight: 500;
+        }
+
+        .form-group input,
+        .form-group textarea {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            background-color: var(--bg-primary);
+            color: var(--text-primary);
+            font-family: inherit;
+            font-size: 14px;
+        }
+
+        .form-group textarea {
+            resize: vertical;
+            min-height: 80px;
+        }
+
+        .form-group small {
+            display: block;
+            margin-top: 6px;
+            color: var(--text-secondary);
+            font-size: 12px;
+        }
+
+        .btn-secondary {
+            width: 100%;
+            padding: 10px;
+            background-color: transparent;
+            color: var(--text-primary);
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            font-size: 14px;
+            cursor: pointer;
+            margin-top: 8px;
+        }
+
+        .btn-danger {
+            background-color: #ff4757;
+        }
+
+        .video-item {
+            background-color: var(--bg-primary);
+            padding: 12px;
+            border-radius: 6px;
+            margin-bottom: 8px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border: 1px solid var(--border-color);
+        }
+
+        .video-item-title {
+            flex: 1;
+            font-size: 13px;
+        }
+
+        .video-item-actions {
+            display: flex;
+            gap: 6px;
+        }
+
+        .btn-small {
+            padding: 6px 10px;
+            font-size: 11px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            white-space: nowrap;
+            color: white;
+        }
+
+        .btn-edit {
+            background-color: #3498db;
+        }
+
+        .btn-delete {
+            background-color: #e74c3c;
+        }
+
+        .message {
+            padding: 10px 12px;
+            border-radius: 6px;
+            margin-bottom: 12px;
+            font-size: 13px;
+        }
+
+        .message.success {
+            background-color: #d4edda;
+            color: #155724;
+        }
+
+        .message.error {
+            background-color: #f8d7da;
+            color: #721c24;
+        }
     </style>
 </head>
 <body>
-    <!-- Header -->
     <div class="header">
         <button class="back-btn" id="backBtn">←</button>
         <div class="header-title" id="headerTitle">ParaVidhya</div>
         <div class="header-controls">
-            <button class="btn-icon" id="darkModeBtn">🌙</button>
-            <button class="btn-icon" id="settingsBtn">⚙️</button>
+            <button class="btn-icon" id="darkModeBtn" type="button">🌙</button>
+            <button class="btn-icon" id="settingsBtn" type="button">⚙️</button>
         </div>
     </div>
 
-    <!-- Content -->
     <div class="content">
         <!-- Home Screen -->
         <div class="screen active" id="homeScreen">
-            <div class="home-screen">
-                <div id="videosList" class="videos-grid"></div>
-                <div id="emptyState" class="empty-state" style="display: none;">
-                    <p>🎬 कोई वीडियो नहीं</p>
-                </div>
+            <div id="videosList" class="videos-grid"></div>
+            <div id="emptyState" class="empty-state" style="display: none;">
+                <div class="empty-icon">🎬</div>
+                <p style="margin-bottom: 20px;">कोई वीडियो नहीं</p>
+                <p style="font-size: 13px; color: var(--text-secondary); line-height: 1.6;">
+                    पहली वीडियो जोड़ने के लिए:<br><br>
+                    ⚙️ Settings → एडमिन पैनल → पासवर्ड: <strong>1234</strong>
+                </p>
+            </div>
+            <div id="loadingState" class="loading">
+                <div class="spinner"></div>
             </div>
         </div>
 
         <!-- Player Screen -->
-        <div class="screen" id="playerScreen">
-            <div class="player-screen">
-                <div class="player-container">
-                    <iframe id="ytPlayer" frameborder="0" allow="autoplay" allowfullscreen></iframe>
-                </div>
-                <div class="video-details">
-                    <div class="video-title-large" id="playerTitle">लोड हो रहा है...</div>
-                    <div class="captions-box">
-                        <div class="caption-text" id="captionText">कैप्शन यहाँ दिखेंगे...</div>
-                    </div>
+        <div class="screen" id="playerScreen" class="player-screen">
+            <div class="player-container">
+                <iframe id="ytPlayer" frameborder="0" allow="autoplay" allowfullscreen></iframe>
+            </div>
+            <div style="flex: 1; overflow-y: auto; padding: 16px;">
+                <div id="playerTitle" style="font-size: 16px; font-weight: 600; margin-bottom: 12px;">लोड हो रहा है...</div>
+                <div style="background-color: var(--bg-secondary); border-radius: 8px; padding: 16px; text-align: center;">
+                    कैप्शन यहाँ दिखेंगे...
                 </div>
             </div>
         </div>
 
         <!-- Admin Screen -->
         <div class="screen" id="adminScreen">
-            <div class="admin-screen">
-                <div id="adminMsg"></div>
+            <div id="adminMsg"></div>
 
-                <div class="form-section">
-                    <h3 id="formTitle">नया वीडियो जोड़ें</h3>
-                    <div class="form-group">
-                        <label>शीर्षक</label>
-                        <input type="text" id="videoTitle" placeholder="शीर्षक">
-                    </div>
-                    <div class="form-group">
-                        <label>YouTube URL</label>
-                        <input type="text" id="youtubeUrl" placeholder="https://youtu.be/...">
-                    </div>
-                    <div class="form-group">
-                        <label>कैप्शन फ़ाइल (JSON)</label>
-                        <input type="file" id="captionsFile" accept=".json">
-                        <small style="color: var(--text-secondary); display: block; margin-top: 6px;">[[start, end, "text"], ...]</small>
-                    </div>
-                    <button class="btn-primary" id="submitBtn">जोड़ें</button>
-                    <button class="btn-secondary btn-danger" id="cancelBtn" style="display: none;">रद्द करें</button>
+            <!-- Add/Edit Video Form -->
+            <div class="form-section">
+                <h3 id="formTitle">नया वीडियो जोड़ें</h3>
+                
+                <div class="form-group">
+                    <label>वीडियो शीर्षक</label>
+                    <input type="text" id="videoTitle" placeholder="शीर्षक दर्ज करें">
                 </div>
 
-                <div class="form-section">
-                    <h3>सभी वीडियो</h3>
-                    <div id="videosList2"></div>
-                    <div id="emptyVideos" class="empty-state" style="display: none;">
-                        <p>कोई वीडियो नहीं</p>
-                    </div>
+                <div class="form-group">
+                    <label>YouTube URL</label>
+                    <input type="text" id="youtubeUrl" placeholder="https://youtu.be/...">
+                    <small>शॉर्ट या फुल URL दोनों काम करेंगे</small>
+                </div>
+
+                <div class="form-group">
+                    <label>कैप्शन फ़ाइल (JSON)</label>
+                    <input type="file" id="captionsFile" accept=".json">
+                    <small>प्रारूप: [[start, end, "text"], ...]</small>
+                </div>
+
+                <div id="fileStatus" style="color: var(--text-secondary); font-size: 13px; margin-top: 8px;"></div>
+
+                <button class="btn-primary" id="submitBtn">वीडियो जोड़ें</button>
+                <button class="btn-secondary btn-danger" id="cancelBtn" style="display: none;">रद्द करें</button>
+            </div>
+
+            <!-- Videos List -->
+            <div class="form-section">
+                <h3>सभी वीडियो</h3>
+                <div id="videosList2"></div>
+                <div id="emptyVideos" class="empty-state" style="display: none; padding: 20px;">
+                    <p>कोई वीडियो नहीं</p>
                 </div>
             </div>
         </div>
     </div>
 
-    <!-- Settings Modal (Bottom Sheet) -->
+    <!-- Settings Modal -->
     <div class="modal-overlay" id="settingsModal">
         <div class="modal-content">
             <div class="modal-header">
                 <h2>सेटिंग्स</h2>
-                <button class="close-btn" id="closeSettings">✕</button>
+                <button class="close-btn" id="closeSettingsBtn" type="button">✕</button>
             </div>
             <div class="toggle-item">
                 <label>डार्क मोड</label>
@@ -603,24 +626,23 @@
                     <span class="toggle-slider"></span>
                 </label>
             </div>
-            <div class="form-group" style="margin-top: 16px;">
-                <button class="btn-primary" id="adminBtn">एडमिन पैनल खोलें</button>
-            </div>
+            <button class="btn-primary" id="adminBtn" type="button">एडमिन पैनल खोलें</button>
         </div>
     </div>
 
-    <!-- Password Modal (Center Overlay) -->
+    <!-- Password Modal -->
     <div class="password-overlay" id="passwordOverlay">
         <div class="password-box">
             <h2>एडमिन पैनल</h2>
-            <input type="password" id="passwordInput" class="password-input" placeholder="पासवर्ड">
+            <input type="password" id="passwordInput" class="password-input" placeholder="पासवर्ड" autocomplete="off">
             <div class="password-error" id="passError"></div>
-            <button class="btn-primary" id="passBtn">लॉगिन करें</button>
+            <button class="btn-primary" id="passBtn" type="button">लॉगिन करें</button>
         </div>
     </div>
 
     <script>
-        // Firebase Config
+        console.log('✅ App Starting...');
+
         const firebaseConfig = {
             apiKey: "AIzaSyCGHJR74q0Xfj4QQz8uc36Qyb0kBlAI384",
             authDomain: "paravidhya-ki-paathshala.firebaseapp.com",
@@ -633,303 +655,329 @@
         firebase.initializeApp(firebaseConfig);
         const db = firebase.database();
 
-        // State
-        const state = {
+        const app = {
             videos: [],
-            currentVideo: null,
-            isAdminLoggedIn: false,
-            editingId: null,
             isDarkMode: localStorage.getItem('darkMode') === 'true',
-            captionsData: null
+            captionsData: null,
+            editingId: null,
+            
+            init() {
+                console.log('🚀 Initializing app...');
+                this.setupEvents();
+                this.loadDarkMode();
+                this.loadVideos();
+            },
+
+            setupEvents() {
+                document.getElementById('darkModeBtn').addEventListener('click', () => this.toggleDarkMode());
+                document.getElementById('darkToggle').addEventListener('change', () => this.toggleDarkMode());
+                document.getElementById('settingsBtn').addEventListener('click', () => this.openSettings());
+                document.getElementById('closeSettingsBtn').addEventListener('click', () => this.closeSettings());
+                document.getElementById('adminBtn').addEventListener('click', () => this.openPasswordModal());
+                document.getElementById('passBtn').addEventListener('click', () => this.checkPassword());
+                document.getElementById('backBtn').addEventListener('click', () => this.goHome());
+                document.getElementById('passwordInput').addEventListener('keypress', (e) => {
+                    if (e.key === 'Enter') this.checkPassword();
+                });
+                document.getElementById('submitBtn').addEventListener('click', () => this.saveVideo());
+                document.getElementById('cancelBtn').addEventListener('click', () => this.cancelEdit());
+                document.getElementById('captionsFile').addEventListener('change', (e) => this.handleFileUpload(e));
+                console.log('✅ Events setup complete');
+            },
+
+            toggleDarkMode() {
+                this.isDarkMode = !this.isDarkMode;
+                localStorage.setItem('darkMode', this.isDarkMode);
+                this.loadDarkMode();
+                console.log('Dark mode:', this.isDarkMode);
+            },
+
+            loadDarkMode() {
+                if (this.isDarkMode) {
+                    document.body.classList.add('dark-mode');
+                    document.getElementById('darkToggle').checked = true;
+                    document.getElementById('darkModeBtn').textContent = '☀️';
+                } else {
+                    document.body.classList.remove('dark-mode');
+                    document.getElementById('darkToggle').checked = false;
+                    document.getElementById('darkModeBtn').textContent = '🌙';
+                }
+            },
+
+            showScreen(screenId) {
+                document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+                document.getElementById(screenId).classList.add('active');
+
+                const backBtn = document.getElementById('backBtn');
+                if (screenId === 'homeScreen') {
+                    backBtn.classList.remove('show');
+                    document.getElementById('headerTitle').textContent = 'ParaVidhya';
+                } else {
+                    backBtn.classList.add('show');
+                    document.getElementById('headerTitle').textContent = screenId === 'playerScreen' ? 'वीडियो' : 'एडमिन';
+                }
+                console.log('Screen changed to:', screenId);
+            },
+
+            goHome() {
+                this.showScreen('homeScreen');
+            },
+
+            openSettings() {
+                document.getElementById('settingsModal').classList.add('active');
+                console.log('Settings opened');
+            },
+
+            closeSettings() {
+                document.getElementById('settingsModal').classList.remove('active');
+                console.log('Settings closed');
+            },
+
+            openPasswordModal() {
+                this.closeSettings();
+                document.getElementById('passwordOverlay').classList.add('active');
+                document.getElementById('passwordInput').value = '';
+                document.getElementById('passError').textContent = '';
+                setTimeout(() => document.getElementById('passwordInput').focus(), 100);
+                console.log('Password modal opened');
+            },
+
+            checkPassword() {
+                const pass = document.getElementById('passwordInput').value;
+                console.log('Password check:', pass);
+                
+                if (pass === '1234') {
+                    console.log('✅ Correct password!');
+                    document.getElementById('passwordOverlay').classList.remove('active');
+                    this.showAdminPanel();
+                    this.showScreen('adminScreen');
+                } else {
+                    console.log('❌ Wrong password');
+                    document.getElementById('passError').textContent = 'गलत पासवर्ड';
+                    document.getElementById('passwordInput').value = '';
+                }
+            },
+
+            showAdminPanel() {
+                this.loadAdminVideos();
+                this.resetForm();
+            },
+
+            handleFileUpload(e) {
+                const file = e.target.files[0];
+                if (!file) return;
+                
+                const reader = new FileReader();
+                reader.onload = (evt) => {
+                    try {
+                        this.captionsData = JSON.parse(evt.target.result);
+                        const count = this.captionsData.length;
+                        document.getElementById('fileStatus').textContent = `✅ ${count} कैप्शन लोड हो गए`;
+                        console.log('✅ Captions loaded:', count);
+                    } catch (error) {
+                        document.getElementById('fileStatus').textContent = '❌ JSON अमान्य है';
+                        this.captionsData = null;
+                        console.error('JSON Error:', error);
+                    }
+                };
+                reader.readAsText(file);
+            },
+
+            saveVideo() {
+                const title = document.getElementById('videoTitle').value.trim();
+                const url = document.getElementById('youtubeUrl').value.trim();
+
+                if (!title || !url) {
+                    this.showMsg('सभी फ़ील्ड भरें', 'error');
+                    return;
+                }
+
+                const videoId = this.extractVideoId(url);
+                if (!videoId) {
+                    this.showMsg('अमान्य YouTube URL', 'error');
+                    return;
+                }
+
+                if (!this.editingId && !this.captionsData) {
+                    this.showMsg('कैप्शन फ़ाइल अपलोड करें', 'error');
+                    return;
+                }
+
+                const data = {
+                    title,
+                    youtubeUrl: url,
+                    videoId,
+                    captions: this.captionsData || (this.videos.find(v => v.id === this.editingId)?.captions || []),
+                    thumbnail: `https://img.youtube.com/vi/${videoId}/hqdefault.jpg`
+                };
+
+                if (this.editingId) {
+                    db.ref(`videos/${this.editingId}`).update(data).then(() => {
+                        this.showMsg('✅ वीडियो अपडेट हो गया', 'success');
+                        this.resetForm();
+                        this.loadVideos();
+                        this.loadAdminVideos();
+                    }).catch(error => {
+                        this.showMsg('❌ Error: ' + error.message, 'error');
+                    });
+                } else {
+                    db.ref('videos').push().set(data).then(() => {
+                        this.showMsg('✅ वीडियो जोड़ा गया', 'success');
+                        this.resetForm();
+                        this.loadVideos();
+                        this.loadAdminVideos();
+                    }).catch(error => {
+                        this.showMsg('❌ Error: ' + error.message, 'error');
+                    });
+                }
+            },
+
+            editVideo(id) {
+                const video = this.videos.find(v => v.id === id);
+                if (!video) return;
+                
+                this.editingId = id;
+                document.getElementById('formTitle').textContent = 'वीडियो संपादित करें';
+                document.getElementById('videoTitle').value = video.title;
+                document.getElementById('youtubeUrl').value = video.youtubeUrl;
+                document.getElementById('submitBtn').textContent = 'अपडेट करें';
+                document.getElementById('cancelBtn').style.display = 'block';
+                console.log('Editing video:', id);
+            },
+
+            deleteVideo(id) {
+                if (!confirm('क्या आप यह वीडियो हटाना चाहते हैं?')) return;
+                
+                db.ref(`videos/${id}`).remove().then(() => {
+                    this.showMsg('✅ वीडियो हटा दिया गया', 'success');
+                    this.loadVideos();
+                    this.loadAdminVideos();
+                }).catch(error => {
+                    this.showMsg('❌ Error: ' + error.message, 'error');
+                });
+            },
+
+            cancelEdit() {
+                this.resetForm();
+            },
+
+            resetForm() {
+                this.editingId = null;
+                this.captionsData = null;
+                document.getElementById('formTitle').textContent = 'नया वीडियो जोड़ें';
+                document.getElementById('videoTitle').value = '';
+                document.getElementById('youtubeUrl').value = '';
+                document.getElementById('captionsFile').value = '';
+                document.getElementById('fileStatus').textContent = '';
+                document.getElementById('submitBtn').textContent = 'वीडियो जोड़ें';
+                document.getElementById('cancelBtn').style.display = 'none';
+            },
+
+            loadAdminVideos() {
+                const list = document.getElementById('videosList2');
+                const empty = document.getElementById('emptyVideos');
+                
+                if (this.videos.length === 0) {
+                    list.innerHTML = '';
+                    empty.style.display = 'block';
+                    return;
+                }
+
+                empty.style.display = 'none';
+                list.innerHTML = this.videos.map(v => `
+                    <div class="video-item">
+                        <div class="video-item-title">${v.title}</div>
+                        <div class="video-item-actions">
+                            <button class="btn-small btn-edit" onclick="app.editVideo('${v.id}')">संपादित करें</button>
+                            <button class="btn-small btn-delete" onclick="app.deleteVideo('${v.id}')">हटाएं</button>
+                        </div>
+                    </div>
+                `).join('');
+                console.log('Admin videos loaded');
+            },
+
+            loadVideos() {
+                console.log('📥 Loading videos from Firebase...');
+                const loading = document.getElementById('loadingState');
+                const empty = document.getElementById('emptyState');
+                const list = document.getElementById('videosList');
+
+                db.ref('videos').once('value', (snapshot) => {
+                    this.videos = [];
+                    snapshot.forEach(child => {
+                        this.videos.push({ id: child.key, ...child.val() });
+                    });
+                    
+                    console.log('✅ Videos loaded:', this.videos.length);
+                    loading.style.display = 'none';
+
+                    if (this.videos.length === 0) {
+                        empty.style.display = 'block';
+                        list.innerHTML = '';
+                    } else {
+                        empty.style.display = 'none';
+                        this.renderVideos();
+                    }
+                }).catch((error) => {
+                    console.error('❌ Firebase error:', error);
+                    loading.style.display = 'none';
+                    empty.style.display = 'block';
+                    empty.innerHTML = '<div class="empty-icon">⚠️</div><p>डेटा लोड नहीं हो सका</p>';
+                });
+            },
+
+            renderVideos() {
+                const list = document.getElementById('videosList');
+                list.innerHTML = this.videos.map(v => `
+                    <div class="video-card" onclick="app.playVideo('${v.id}')">
+                        <div class="video-thumbnail">
+                            <img src="${v.thumbnail}" alt="${v.title}" onerror="this.style.display='none'">
+                            <div class="play-icon">▶</div>
+                        </div>
+                        <div class="video-info">
+                            <div class="video-title">${v.title}</div>
+                        </div>
+                    </div>
+                `).join('');
+                console.log('✅ Videos rendered');
+            },
+
+            playVideo(id) {
+                const video = this.videos.find(v => v.id === id);
+                if (!video) {
+                    console.error('Video not found:', id);
+                    return;
+                }
+                
+                console.log('Playing video:', video.title);
+                document.getElementById('playerTitle').textContent = video.title;
+                document.getElementById('ytPlayer').src = `https://www.youtube.com/embed/${video.videoId}?autoplay=1`;
+                this.showScreen('playerScreen');
+            },
+
+            extractVideoId(url) {
+                try {
+                    const u = new URL(url);
+                    if (u.hostname.includes('youtu.be')) {
+                        return u.pathname.substring(1).split('?')[0];
+                    } else if (u.hostname.includes('youtube.com')) {
+                        return u.searchParams.get('v');
+                    }
+                } catch (error) {
+                    return null;
+                }
+                return null;
+            },
+
+            showMsg(msg, type) {
+                const msgEl = document.getElementById('adminMsg');
+                msgEl.innerHTML = `<div class="message ${type}">${msg}</div>`;
+                setTimeout(() => msgEl.innerHTML = '', 3000);
+            }
         };
 
-        // Init
-        function init() {
-            setupEvents();
-            loadDarkMode();
-            loadVideos();
-            console.log('✅ App Initialized - Home screen visible');
-        }
-
-        function setupEvents() {
-            document.getElementById('backBtn').addEventListener('click', goHome);
-            document.getElementById('darkModeBtn').addEventListener('click', toggleDarkMode);
-            document.getElementById('darkToggle').addEventListener('change', toggleDarkMode);
-            document.getElementById('settingsBtn').addEventListener('click', openSettings);
-            document.getElementById('closeSettings').addEventListener('click', closeSettings);
-            document.getElementById('adminBtn').addEventListener('click', openPasswordModal);
-            document.getElementById('passBtn').addEventListener('click', checkPassword);
-            document.getElementById('passwordInput').addEventListener('keypress', (e) => {
-                if (e.key === 'Enter') checkPassword();
-            });
-            document.getElementById('submitBtn').addEventListener('click', saveVideo);
-            document.getElementById('cancelBtn').addEventListener('click', cancelEdit);
-            document.getElementById('captionsFile').addEventListener('change', handleFileUpload);
-        }
-
-        // Dark Mode
-        function toggleDarkMode() {
-            state.isDarkMode = !state.isDarkMode;
-            localStorage.setItem('darkMode', state.isDarkMode);
-            loadDarkMode();
-        }
-
-        function loadDarkMode() {
-            if (state.isDarkMode) {
-                document.body.classList.add('dark-mode');
-                document.getElementById('darkToggle').checked = true;
-                document.getElementById('darkModeBtn').textContent = '☀️';
-            } else {
-                document.body.classList.remove('dark-mode');
-                document.getElementById('darkToggle').checked = false;
-                document.getElementById('darkModeBtn').textContent = '🌙';
-            }
-        }
-
-        // Navigation
-        function showScreen(screenId) {
-            document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
-            document.getElementById(screenId).classList.add('active');
-
-            const backBtn = document.getElementById('backBtn');
-            const headerTitle = document.getElementById('headerTitle');
-
-            if (screenId === 'homeScreen') {
-                backBtn.classList.remove('show');
-                headerTitle.textContent = 'ParaVidhya';
-            } else {
-                backBtn.classList.add('show');
-                headerTitle.textContent = screenId === 'playerScreen' ? 'वीडियो' : 'एडमिन';
-            }
-        }
-
-        function goHome() {
-            showScreen('homeScreen');
-        }
-
-        // Settings Modal
-        function openSettings() {
-            document.getElementById('settingsModal').classList.add('active');
-        }
-
-        function closeSettings() {
-            document.getElementById('settingsModal').classList.remove('active');
-        }
-
-        // Password Modal
-        function openPasswordModal() {
-            closeSettings();
-            document.getElementById('passwordOverlay').classList.add('active');
-            document.getElementById('passwordInput').value = '';
-            document.getElementById('passError').textContent = '';
-            setTimeout(() => document.getElementById('passwordInput').focus(), 100);
-        }
-
-        function closePasswordModal() {
-            document.getElementById('passwordOverlay').classList.remove('active');
-        }
-
-        function checkPassword() {
-            const pass = document.getElementById('passwordInput').value;
-            
-            if (pass === '1234') {
-                state.isAdminLoggedIn = true;
-                closePasswordModal();
-                loadAdminVideos();
-                showScreen('adminScreen');
-                console.log('✅ Admin panel opened');
-            } else {
-                document.getElementById('passError').textContent = 'गलत पासवर्ड';
-                document.getElementById('passwordInput').value = '';
-            }
-        }
-
-        // Admin Functions
-        function handleFileUpload(e) {
-            const file = e.target.files[0];
-            if (!file) return;
-            const reader = new FileReader();
-            reader.onload = (evt) => {
-                try {
-                    state.captionsData = JSON.parse(evt.target.result);
-                    showMsg(`${state.captionsData.length} कैप्शन लोड`, 'success');
-                } catch {
-                    showMsg('JSON अमान्य', 'error');
-                    state.captionsData = null;
-                }
-            };
-            reader.readAsText(file);
-        }
-
-        function saveVideo() {
-            const title = document.getElementById('videoTitle').value.trim();
-            const url = document.getElementById('youtubeUrl').value.trim();
-
-            if (!title || !url) {
-                showMsg('सभी फ़ील्ड भरें', 'error');
-                return;
-            }
-
-            const videoId = extractVideoId(url);
-            if (!videoId) {
-                showMsg('अमान्य URL', 'error');
-                return;
-            }
-
-            if (!state.editingId && !state.captionsData) {
-                showMsg('कैप्शन फ़ाइल लोड करें', 'error');
-                return;
-            }
-
-            const data = {
-                title,
-                youtubeUrl: url,
-                videoId,
-                captions: state.captionsData || (state.videos.find(v => v.id === state.editingId)?.captions || []),
-                thumbnail: `https://img.youtube.com/vi/${videoId}/hqdefault.jpg`
-            };
-
-            if (state.editingId) {
-                db.ref(`videos/${state.editingId}`).update(data).then(() => {
-                    showMsg('अपडेट हो गया', 'success');
-                    resetForm();
-                    loadVideos();
-                    loadAdminVideos();
-                });
-            } else {
-                db.ref('videos').push().set(data).then(() => {
-                    showMsg('जोड़ा गया', 'success');
-                    resetForm();
-                    loadVideos();
-                    loadAdminVideos();
-                });
-            }
-        }
-
-        function editVideo(id) {
-            const video = state.videos.find(v => v.id === id);
-            if (!video) return;
-            state.editingId = id;
-            document.getElementById('formTitle').textContent = 'संपादित करें';
-            document.getElementById('videoTitle').value = video.title;
-            document.getElementById('youtubeUrl').value = video.youtubeUrl;
-            document.getElementById('submitBtn').textContent = 'अपडेट करें';
-            document.getElementById('cancelBtn').style.display = 'block';
-        }
-
-        function deleteVideo(id) {
-            if (confirm('हटाएं?')) {
-                db.ref(`videos/${id}`).remove().then(() => {
-                    loadVideos();
-                    loadAdminVideos();
-                });
-            }
-        }
-
-        function cancelEdit() {
-            resetForm();
-        }
-
-        function resetForm() {
-            state.editingId = null;
-            document.getElementById('formTitle').textContent = 'नया वीडियो जोड़ें';
-            document.getElementById('videoTitle').value = '';
-            document.getElementById('youtubeUrl').value = '';
-            document.getElementById('captionsFile').value = '';
-            document.getElementById('submitBtn').textContent = 'जोड़ें';
-            document.getElementById('cancelBtn').style.display = 'none';
-            state.captionsData = null;
-        }
-
-        function loadAdminVideos() {
-            const list = document.getElementById('videosList2');
-            const empty = document.getElementById('emptyVideos');
-            
-            if (state.videos.length === 0) {
-                list.innerHTML = '';
-                empty.style.display = 'block';
-                return;
-            }
-
-            empty.style.display = 'none';
-            list.innerHTML = state.videos.map(v => `
-                <div class="video-item">
-                    <div class="video-item-title">${v.title}</div>
-                    <div class="video-item-actions">
-                        <button class="btn-small btn-edit" onclick="editVideo('${v.id}')">संपादित करें</button>
-                        <button class="btn-small btn-delete" onclick="deleteVideo('${v.id}')">हटाएं</button>
-                    </div>
-                </div>
-            `).join('');
-        }
-
-        // Videos
-        function loadVideos() {
-            db.ref('videos').once('value', snapshot => {
-                state.videos = [];
-                snapshot.forEach(child => {
-                    state.videos.push({ id: child.key, ...child.val() });
-                });
-                renderVideos();
-            });
-        }
-
-        function renderVideos() {
-            const list = document.getElementById('videosList');
-            const empty = document.getElementById('emptyState');
-
-            if (state.videos.length === 0) {
-                list.innerHTML = '';
-                empty.style.display = 'block';
-                return;
-            }
-
-            empty.style.display = 'none';
-            list.innerHTML = state.videos.map(v => `
-                <div class="video-card" onclick="playVideo('${v.id}')">
-                    <div class="video-thumbnail">
-                        <img src="${v.thumbnail}" alt="${v.title}" onerror="this.src='data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22%3E%3Crect fill=%22%23333%22 width=%22100%22 height=%22100%22/%3E%3Ctext x=%2250%22 y=%2250%22 text-anchor=%22middle%22 dy=%22.3em%22 fill=%22%23666%22 font-size=%2224%22%3E🎬%3C/text%3E%3C/svg%3E'">
-                        <div class="play-icon">▶</div>
-                    </div>
-                    <div class="video-info">
-                        <div class="video-title">${v.title}</div>
-                    </div>
-                </div>
-            `).join('');
-        }
-
-        function playVideo(id) {
-            const video = state.videos.find(v => v.id === id);
-            if (!video) return;
-
-            state.currentVideo = video;
-            document.getElementById('playerTitle').textContent = video.title;
-            document.getElementById('ytPlayer').src = `https://www.youtube.com/embed/${video.videoId}?autoplay=1`;
-            document.getElementById('captionText').textContent = 'कैप्शन यहाँ दिखेंगे...';
-
-            showScreen('playerScreen');
-        }
-
-        // Utilities
-        function extractVideoId(url) {
-            try {
-                const u = new URL(url);
-                return u.hostname.includes('youtu.be') 
-                    ? u.pathname.substring(1).split('?')[0]
-                    : u.searchParams.get('v');
-            } catch {
-                return null;
-            }
-        }
-
-        function showMsg(msg, type) {
-            const msgEl = document.getElementById('adminMsg');
-            msgEl.innerHTML = `<div class="message ${type}">${msg}</div>`;
-            setTimeout(() => msgEl.innerHTML = '', 3000);
-        }
-
         // Start
-        init();
+        app.init();
     </script>
 </body>
 </html>

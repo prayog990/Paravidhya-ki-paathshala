@@ -529,9 +529,46 @@
       display: inline;
       padding: 1px 0px;
       border-radius: 4px;
-      transition: background 0.2s, color 0.2s;
+      transition: all 0.2s ease;
       -webkit-box-decoration-break: clone;
       box-decoration-break: clone;
+    }
+
+    .caption-word {
+      display: inline-block;
+      transition: color 0.12s ease, background 0.12s ease, text-shadow 0.12s ease, transform 0.12s ease;
+      border-radius: 3px;
+    }
+
+    /* Style Option 1: Soft Box */
+    [data-highlight-style="soft-box"] .caption-line.active-line {
+      background: rgba(138, 180, 248, 0.15);
+      color: #FFFFFF !important;
+      font-weight: 600;
+      border-radius: 6px;
+      padding: 2px 4px;
+    }
+    [data-highlight-style="soft-box"] .caption-word.active-word {
+      color: #FFFFFF !important;
+      font-weight: 700;
+      background: var(--primary);
+      padding: 1px 4px;
+      border-radius: 4px;
+      transform: scale(1.03);
+    }
+
+    /* Style Option 2: Text Glow */
+    [data-highlight-style="text-glow"] .caption-line.active-line {
+      color: var(--primary) !important;
+      font-weight: 700;
+      text-shadow: 0 0 10px rgba(138, 180, 248, 0.6);
+      background: transparent;
+    }
+    [data-highlight-style="text-glow"] .caption-word.active-word {
+      color: var(--warning) !important;
+      font-weight: 700;
+      text-shadow: 0 0 12px rgba(253, 214, 99, 0.85);
+      transform: scale(1.05);
     }
 
     .caption-line.editable-line {
@@ -1062,16 +1099,27 @@
     <div class="content-scrollable">
       <!-- Caption Display Group -->
       <div class="settings-group">
-        <div class="settings-group-title">कैप्शन डिस्प्ले (Caption Mode)</div>
+        <div class="settings-group-title">कैप्शन और सिंक सेटिंग्स (Caption Sync)</div>
+        
         <div class="setting-item">
           <div class="setting-label-box">
-            <span class="setting-label">दृश्यमान कैप्शन (Visible Captions)</span>
-            <span class="setting-desc">स्क्रीन पर एक साथ कितने कैप्शन दिखें</span>
+            <span class="setting-label">हाइलाइट स्टाइल (Highlight Style)</span>
+            <span class="setting-desc">सॉफ्ट बॉक्स या टेक्स्ट ग्लो चुनें</span>
           </div>
-          <select id="caption-mode-select" class="select-dropdown" onchange="App.setCaptionMode(this.value)">
-            <option value="1">1 कैप्शन (Only Current)</option>
-            <option value="2">2 कैप्शन (Previous & Current)</option>
-            <option value="3" selected>3 कैप्शन (Prev, Current, Next)</option>
+          <select id="highlight-style-select" class="select-dropdown" onchange="App.setHighlightStyle(this.value)">
+            <option value="soft-box">सॉफ्ट बॉक्स (Soft Box)</option>
+            <option value="text-glow">टेक्स्ट ग्लो (Text Glow)</option>
+          </select>
+        </div>
+
+        <div class="setting-item">
+          <div class="setting-label-box">
+            <span class="setting-label">हाइलाइट इफ़ेक्ट (Animation Effect)</span>
+            <span class="setting-desc">शब्द-दर-शब्द या पूरी लाइन</span>
+          </div>
+          <select id="highlight-effect-select" class="select-dropdown" onchange="App.setHighlightEffect(this.value)">
+            <option value="word">शब्द-दर-शब्द (Word by Word Karaoke)</option>
+            <option value="line">पूरी लाइन एक साथ (Line by Line)</option>
           </select>
         </div>
       </div>
@@ -1250,12 +1298,19 @@
       currentVideo: JSON.parse(localStorage.getItem('lastVideo') || 'null'),
       captionMode: localStorage.getItem('captionMode') || '3',
       currentTheme: localStorage.getItem('appTheme') || 'dark',
+      highlightStyle: localStorage.getItem('highlightStyle') || 'soft-box',
+      highlightEffect: localStorage.getItem('highlightEffect') || 'word',
 
       init() {
         this.applyTheme(this.currentTheme);
         this.updateThemeIcons();
-        if (document.getElementById('caption-mode-select')) {
-          document.getElementById('caption-mode-select').value = this.captionMode;
+        this.applyHighlightStyle(this.highlightStyle);
+
+        if (document.getElementById('highlight-style-select')) {
+          document.getElementById('highlight-style-select').value = this.highlightStyle;
+        }
+        if (document.getElementById('highlight-effect-select')) {
+          document.getElementById('highlight-effect-select').value = this.highlightEffect;
         }
 
         // Restore screen state
@@ -1276,6 +1331,22 @@
 
         // Initialize Firebase Listeners
         FirebaseModule.initListeners();
+      },
+
+      setHighlightStyle(val) {
+        this.highlightStyle = val;
+        localStorage.setItem('highlightStyle', val);
+        this.applyHighlightStyle(val);
+      },
+
+      applyHighlightStyle(val) {
+        document.documentElement.setAttribute('data-highlight-style', val);
+      },
+
+      setHighlightEffect(val) {
+        this.highlightEffect = val;
+        localStorage.setItem('highlightEffect', val);
+        CaptionSyncEngine.renderCaptions();
       },
 
       toggleTheme() {
@@ -1301,12 +1372,6 @@
         document.querySelectorAll('.theme-toggle-btn').forEach(btn => {
           btn.innerHTML = isDark ? sunIcon : moonIcon;
         });
-      },
-
-      setCaptionMode(val) {
-        this.captionMode = val;
-        localStorage.setItem('captionMode', val);
-        CaptionSyncEngine.renderCaptions();
       },
 
       navigateTo(screenId) {
@@ -1556,16 +1621,13 @@
           const lastLine = block.lines[block.lines.length - 1];
           const timeFormatted = `${this.formatTime(firstLine.start)} - ${this.formatTime(lastLine.end)}`;
 
-          let headerHTML = `
-            <div class="caption-timestamp">
-              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>
-              ${timeFormatted}
-            </div>
-          `;
-
           if (this.isEditMode) {
-            // Edit Mode UI
-            headerHTML += `
+            // Edit Mode UI: Shows Timestamps, Speaker Input and Actions
+            let headerHTML = `
+              <div class="caption-timestamp" style="display: flex; margin-bottom: 8px;">
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>
+                ${timeFormatted}
+              </div>
               <input type="text" class="speaker-input" placeholder="👤 वक्ता का नाम लिखें (उदा. गुरुदेव, साधक)..." value="${this.escapeHTML(block.speaker || '')}" oninput="CaptionSyncEngine.setSpeaker(${bIdx}, this.value)">
             `;
 
@@ -1584,14 +1646,20 @@
 
             card.innerHTML = headerHTML + `<div>${linesHTML}</div>` + actionsHTML;
           } else {
-            // Normal Viewer Mode UI
+            // Normal Viewer Mode UI: Timestamps completely hidden, shows clean Speaker badge and Word spans
+            let headerHTML = '';
             if (block.speaker && block.speaker.trim()) {
-              headerHTML += `<div class="speaker-badge">👤 ${this.escapeHTML(block.speaker)}</div>`;
+              headerHTML = `<div class="speaker-badge">👤 ${this.escapeHTML(block.speaker)}</div>`;
             }
 
             let linesHTML = block.lines.map((l, lIdx) => {
               totalLines++;
-              return `<span id="caption-line-${bIdx}-${lIdx}" class="caption-line" onclick="CaptionSyncEngine.seekToCaption(${l.start})">${this.escapeHTML(l.text.trim())}</span>`;
+              const words = l.text.trim().split(/\s+/);
+              const wordsHTML = words.map((w, wIdx) => {
+                return `<span id="word-${bIdx}-${lIdx}-${wIdx}" class="caption-word">${this.escapeHTML(w)}</span>`;
+              }).join(' ');
+
+              return `<span id="caption-line-${bIdx}-${lIdx}" class="caption-line" onclick="CaptionSyncEngine.seekToCaption(${l.start})">${wordsHTML}</span>`;
             }).join(' ');
 
             card.innerHTML = headerHTML + `<div>${linesHTML}</div>`;
@@ -1675,10 +1743,14 @@
 
         const match = this.findActiveIndices(currentTime);
 
-        if (match.blockIdx !== this.currentBlockIdx || match.lineIdx !== this.currentLineIdx) {
+        if (match.blockIdx !== -1) {
           this.currentBlockIdx = match.blockIdx;
           this.currentLineIdx = match.lineIdx;
-          this.updateActiveUI(match.blockIdx, match.lineIdx);
+          this.updateActiveUI(match.blockIdx, match.lineIdx, currentTime);
+        } else if (this.currentBlockIdx !== -1) {
+          this.currentBlockIdx = -1;
+          this.currentLineIdx = -1;
+          this.updateActiveUI(-1, -1, 0);
         }
       },
 
@@ -1695,10 +1767,11 @@
         return { blockIdx: -1, lineIdx: -1 };
       },
 
-      updateActiveUI(bIdx, lIdx) {
+      updateActiveUI(bIdx, lIdx, currentTime) {
         // Clear prior active classes
         document.querySelectorAll('.caption-card.active').forEach(el => el.classList.remove('active'));
         document.querySelectorAll('.caption-line.active-line').forEach(el => el.classList.remove('active-line'));
+        document.querySelectorAll('.caption-word.active-word').forEach(el => el.classList.remove('active-word'));
 
         const badge = document.getElementById('caption-count-badge');
         if (bIdx === -1) {
@@ -1722,6 +1795,21 @@
 
         if (activeLine) {
           activeLine.classList.add('active-line');
+
+          // Word-by-Word Karaoke Animation
+          if (App.highlightEffect === 'word' && typeof currentTime === 'number') {
+            const line = this.blocks[bIdx].lines[lIdx];
+            const words = line.text.trim().split(/\s+/);
+            const duration = Math.max(line.end - line.start, 0.1);
+            const elapsed = Math.max(currentTime - line.start, 0);
+            const progress = Math.min(elapsed / duration, 1);
+            const activeWordIndex = Math.floor(progress * words.length);
+
+            for (let w = 0; w <= activeWordIndex && w < words.length; w++) {
+              const wordEl = document.getElementById(`word-${bIdx}-${lIdx}-${w}`);
+              if (wordEl) wordEl.classList.add('active-word');
+            }
+          }
         }
       },
 

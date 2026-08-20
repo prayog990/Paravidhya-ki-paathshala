@@ -1049,8 +1049,8 @@
      * App Central Controller
      */
     const App = {
-      currentScreen: 'home',
-      currentVideo: null,
+      currentScreen: localStorage.getItem('lastScreen') || 'home',
+      currentVideo: JSON.parse(localStorage.getItem('lastVideo') || 'null'),
       captionMode: localStorage.getItem('captionMode') || '3',
       currentTheme: localStorage.getItem('appTheme') || 'dark',
 
@@ -1058,6 +1058,16 @@
         this.applyTheme(this.currentTheme);
         document.getElementById('theme-select').value = this.currentTheme;
         document.getElementById('caption-mode-select').value = this.captionMode;
+
+        // Restore screen state
+        this.showScreen(this.currentScreen, true);
+
+        // Restore video state if in player
+        if (this.currentScreen === 'player' && this.currentVideo) {
+          document.getElementById('player-screen-title').textContent = this.currentVideo.title;
+          initYouTubePlayer(this.currentVideo.youtubeId);
+          CaptionSyncEngine.loadCaptions(this.currentVideo.captions);
+        }
 
         // Listen for browser back / forward
         window.addEventListener('popstate', (e) => {
@@ -1097,6 +1107,14 @@
 
       showScreen(screenId, isInitial = false) {
         this.currentScreen = screenId;
+        localStorage.setItem('lastScreen', screenId);
+        
+        // If leaving player screen, clear saved video to avoid getting stuck there next time
+        if (screenId !== 'player') {
+          localStorage.removeItem('lastVideo');
+          this.currentVideo = null;
+        }
+
         document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
         const target = document.getElementById(`screen-${screenId}`);
         if (target) target.classList.add('active');
@@ -1425,6 +1443,7 @@
           card.className = 'video-card';
           card.onclick = () => {
             App.currentVideo = { key, ...v };
+            localStorage.setItem('lastVideo', JSON.stringify(App.currentVideo));
             document.getElementById('player-screen-title').textContent = v.title;
             App.navigateTo('player');
             initYouTubePlayer(v.youtubeId);

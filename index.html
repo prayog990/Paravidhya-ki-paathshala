@@ -1,993 +1,1665 @@
 <!DOCTYPE html>
-<html lang="hi">
+<html lang="hi" data-theme="dark">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ParaVidhya - YouTube App</title>
-    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js"></script>
-    <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-
-        html, body {
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-            height: 100%;
-            overflow: hidden;
-        }
-
-        :root {
-            --bg-primary: #ffffff;
-            --bg-secondary: #f5f5f5;
-            --text-primary: #000000;
-            --text-secondary: #666666;
-            --border-color: #e0e0e0;
-            --accent-color: #ff6b6b;
-        }
-
-        body.dark-mode {
-            --bg-primary: #121212;
-            --bg-secondary: #1e1e1e;
-            --text-primary: #ffffff;
-            --text-secondary: #b0b0b0;
-            --border-color: #333333;
-        }
-
-        body {
-            display: flex;
-            flex-direction: column;
-            background-color: var(--bg-primary);
-            color: var(--text-primary);
-            transition: background-color 0.3s, color 0.3s;
-        }
-
-        .header {
-            flex-shrink: 0;
-            background-color: var(--bg-primary);
-            border-bottom: 1px solid var(--border-color);
-            padding: 12px 16px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            height: 56px;
-        }
-
-        .header-title {
-            font-size: 18px;
-            font-weight: 600;
-            flex: 1;
-        }
-
-        .header-controls {
-            display: flex;
-            gap: 12px;
-        }
-
-        .btn-icon {
-            width: 40px;
-            height: 40px;
-            border: none;
-            background: none;
-            cursor: pointer;
-            font-size: 20px;
-            color: var(--text-primary);
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            transition: background-color 0.2s;
-            -webkit-user-select: none;
-            user-select: none;
-        }
-
-        .btn-icon:active {
-            background-color: var(--bg-secondary);
-        }
-
-        .content {
-            flex: 1;
-            overflow-y: auto;
-            -webkit-overflow-scrolling: touch;
-        }
-
-        .screen {
-            display: none;
-            padding: 16px;
-        }
-
-        .screen.active {
-            display: block;
-        }
-
-        .videos-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
-            gap: 12px;
-        }
-
-        .video-card {
-            cursor: pointer;
-            border-radius: 8px;
-            overflow: hidden;
-            background-color: var(--bg-secondary);
-            transition: transform 0.15s;
-        }
-
-        .video-card:active {
-            transform: scale(0.95);
-        }
-
-        .video-thumbnail {
-            width: 100%;
-            aspect-ratio: 16/9;
-            background-color: #000;
-            position: relative;
-        }
-
-        .video-thumbnail img {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-        }
-
-        .play-icon {
-            position: absolute;
-            width: 45px;
-            height: 45px;
-            background-color: rgba(255, 107, 107, 0.9);
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            color: white;
-            font-size: 18px;
-        }
-
-        .video-info {
-            padding: 8px;
-        }
-
-        .video-title {
-            font-size: 13px;
-            font-weight: 500;
-            display: -webkit-box;
-            -webkit-line-clamp: 2;
-            -webkit-box-orient: vertical;
-            overflow: hidden;
-        }
-
-        .empty-state {
-            text-align: center;
-            padding: 60px 20px;
-            color: var(--text-secondary);
-        }
-
-        .empty-icon {
-            font-size: 48px;
-            margin-bottom: 12px;
-        }
-
-        .loading-state {
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
-            height: 100%;
-            gap: 20px;
-        }
-
-        .spinner {
-            width: 40px;
-            height: 40px;
-            border: 4px solid var(--border-color);
-            border-top: 4px solid var(--accent-color);
-            border-radius: 50%;
-            animation: spin 1s linear infinite;
-        }
-
-        @keyframes spin {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
-        }
-
-        .loading-text {
-            font-size: 14px;
-            color: var(--text-secondary);
-        }
-
-        .error-state {
-            text-align: center;
-            padding: 40px 20px;
-        }
-
-        .error-icon {
-            font-size: 48px;
-            margin-bottom: 12px;
-        }
-
-        .error-msg {
-            color: #ff4757;
-            margin-bottom: 16px;
-            font-size: 14px;
-        }
-
-        .btn-primary {
-            padding: 12px 24px;
-            background-color: var(--accent-color);
-            color: white;
-            border: none;
-            border-radius: 6px;
-            font-size: 14px;
-            font-weight: 600;
-            cursor: pointer;
-        }
-
-        .btn-primary:active {
-            opacity: 0.8;
-        }
-
-        .player-screen {
-            display: flex;
-            flex-direction: column;
-            height: 100%;
-            padding: 0;
-        }
-
-        .player-container {
-            flex-shrink: 0;
-            width: 100%;
-            aspect-ratio: 16/9;
-            background-color: #000;
-        }
-
-        .player-container iframe {
-            width: 100%;
-            height: 100%;
-            border: none;
-        }
-
-        .back-btn {
-            display: none;
-            width: 40px;
-            height: 40px;
-            border: none;
-            background: none;
-            font-size: 24px;
-            color: var(--accent-color);
-            cursor: pointer;
-        }
-
-        .back-btn.show {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-
-        .modal-overlay {
-            display: none;
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background-color: rgba(0, 0, 0, 0.5);
-            z-index: 999;
-            justify-content: center;
-            align-items: flex-end;
-        }
-
-        .modal-overlay.active {
-            display: flex;
-        }
-
-        .modal-content {
-            background-color: var(--bg-primary);
-            width: 100%;
-            max-height: 80vh;
-            border-radius: 16px 16px 0 0;
-            overflow-y: auto;
-            padding: 20px;
-            animation: slideUp 0.3s;
-        }
-
-        @keyframes slideUp {
-            from { transform: translateY(100%); }
-            to { transform: translateY(0); }
-        }
-
-        .modal-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 20px;
-        }
-
-        .modal-header h2 {
-            font-size: 16px;
-        }
-
-        .close-btn {
-            background: none;
-            border: none;
-            font-size: 24px;
-            cursor: pointer;
-            color: var(--text-primary);
-            padding: 0;
-            width: 40px;
-            height: 40px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-
-        .toggle-item {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 12px 0;
-            border-bottom: 1px solid var(--border-color);
-        }
-
-        .toggle-switch {
-            position: relative;
-            width: 50px;
-            height: 28px;
-        }
-
-        .toggle-switch input {
-            display: none;
-        }
-
-        .toggle-slider {
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background-color: #ccc;
-            border-radius: 28px;
-            cursor: pointer;
-            transition: background-color 0.3s;
-        }
-
-        .toggle-slider::before {
-            content: '';
-            position: absolute;
-            height: 22px;
-            width: 22px;
-            left: 3px;
-            bottom: 3px;
-            background-color: white;
-            border-radius: 50%;
-            transition: transform 0.3s;
-        }
-
-        .toggle-switch input:checked + .toggle-slider {
-            background-color: var(--accent-color);
-        }
-
-        .toggle-switch input:checked + .toggle-slider::before {
-            transform: translateX(22px);
-        }
-
-        .password-overlay {
-            display: none;
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background-color: rgba(0, 0, 0, 0.7);
-            z-index: 1000;
-            justify-content: center;
-            align-items: center;
-            padding: 20px;
-        }
-
-        .password-overlay.active {
-            display: flex;
-        }
-
-        .password-box {
-            background-color: var(--bg-primary);
-            padding: 30px;
-            border-radius: 12px;
-            width: 100%;
-            max-width: 320px;
-            text-align: center;
-        }
-
-        .password-box h2 {
-            margin-bottom: 20px;
-            font-size: 16px;
-        }
-
-        .password-input {
-            width: 100%;
-            padding: 10px;
-            margin-bottom: 12px;
-            border: 1px solid var(--border-color);
-            border-radius: 6px;
-            background-color: var(--bg-secondary);
-            color: var(--text-primary);
-            font-size: 16px;
-            text-align: center;
-            letter-spacing: 2px;
-        }
-
-        .password-error {
-            color: #ff4757;
-            font-size: 12px;
-            margin-bottom: 12px;
-            min-height: 18px;
-        }
-
-        /* Admin Panel */
-        .form-section {
-            background-color: var(--bg-secondary);
-            border-radius: 8px;
-            padding: 16px;
-            margin-bottom: 16px;
-        }
-
-        .form-section h3 {
-            font-size: 15px;
-            font-weight: 600;
-            margin-bottom: 12px;
-        }
-
-        .form-group {
-            margin-bottom: 12px;
-        }
-
-        .form-group label {
-            display: block;
-            font-size: 13px;
-            margin-bottom: 6px;
-            color: var(--text-secondary);
-            font-weight: 500;
-        }
-
-        .form-group input,
-        .form-group textarea {
-            width: 100%;
-            padding: 10px;
-            border: 1px solid var(--border-color);
-            border-radius: 6px;
-            background-color: var(--bg-primary);
-            color: var(--text-primary);
-            font-family: inherit;
-            font-size: 14px;
-        }
-
-        .form-group textarea {
-            resize: vertical;
-            min-height: 80px;
-        }
-
-        .form-group small {
-            display: block;
-            margin-top: 6px;
-            color: var(--text-secondary);
-            font-size: 12px;
-        }
-
-        .btn-secondary {
-            width: 100%;
-            padding: 10px;
-            background-color: transparent;
-            color: var(--text-primary);
-            border: 1px solid var(--border-color);
-            border-radius: 6px;
-            font-size: 14px;
-            cursor: pointer;
-            margin-top: 8px;
-        }
-
-        .btn-danger {
-            background-color: #ff4757;
-        }
-
-        .video-item {
-            background-color: var(--bg-primary);
-            padding: 12px;
-            border-radius: 6px;
-            margin-bottom: 8px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            border: 1px solid var(--border-color);
-        }
-
-        .video-item-title {
-            flex: 1;
-            font-size: 13px;
-        }
-
-        .video-item-actions {
-            display: flex;
-            gap: 6px;
-        }
-
-        .btn-small {
-            padding: 6px 10px;
-            font-size: 11px;
-            border: none;
-            border-radius: 4px;
-            cursor: pointer;
-            white-space: nowrap;
-            color: white;
-        }
-
-        .btn-edit {
-            background-color: #3498db;
-        }
-
-        .btn-delete {
-            background-color: #e74c3c;
-        }
-
-        .message {
-            padding: 10px 12px;
-            border-radius: 6px;
-            margin-bottom: 12px;
-            font-size: 13px;
-        }
-
-        .message.success {
-            background-color: #d4edda;
-            color: #155724;
-        }
-
-        .message.error {
-            background-color: #f8d7da;
-            color: #721c24;
-        }
-    </style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+  <title>YouTube Sync Captions Player</title>
+  
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&family=Noto+Sans+Devanagari:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+  <!-- Firebase SDKs -->
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
+  
+  <!-- YouTube IFrame API -->
+  <script src="https://www.youtube.com/iframe_api"></script>
+
+  <style>
+    :root {
+      --font-main: 'Plus Jakarta Sans', 'Noto Sans Devanagari', -apple-system, BlinkMacSystemFont, sans-serif;
+      
+      /* Light Theme */
+      --bg-color: #F8F9FA;
+      --surface-color: #FFFFFF;
+      --surface-elevated: #FFFFFF;
+      --primary: #1A73E8;
+      --primary-light: #E8F0FE;
+      --text-main: #1F2328;
+      --text-secondary: #656D76;
+      --text-muted: #8C959F;
+      --border-color: #E1E4E8;
+      --border-light: #F0F2F5;
+      --danger: #D93025;
+      --danger-light: #FCE8E6;
+      --success: #1E8E3E;
+      --success-light: #E6F4EA;
+      --warning: #F9AB00;
+      
+      /* Caption Specific */
+      --caption-active-bg: #E8F0FE;
+      --caption-active-text: #1967D2;
+      --caption-active-border: #1A73E8;
+      --caption-idle-bg: #FFFFFF;
+      --caption-idle-text: #484F58;
+
+      --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.05);
+      --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.08);
+      --shadow-lg: 0 8px 24px rgba(0, 0, 0, 0.12);
+
+      --radius-sm: 8px;
+      --radius-md: 14px;
+      --radius-lg: 20px;
+      --radius-full: 9999px;
+
+      --header-height: 56px;
+      --bottom-nav-height: 64px;
+      --safe-bottom: env(safe-area-inset-bottom, 0px);
+    }
+
+    [data-theme="dark"] {
+      --bg-color: #0F1115;
+      --surface-color: #181B20;
+      --surface-elevated: #22262E;
+      --primary: #8AB4F8;
+      --primary-light: rgba(138, 180, 248, 0.15);
+      --text-main: #F0F3F6;
+      --text-secondary: #9DA7B3;
+      --text-muted: #6E7681;
+      --border-color: #2D333B;
+      --border-light: #1F242C;
+      --danger: #F28B82;
+      --danger-light: rgba(242, 139, 130, 0.15);
+      --success: #81C995;
+      --success-light: rgba(129, 201, 149, 0.15);
+      --warning: #FDD663;
+
+      /* Caption Specific */
+      --caption-active-bg: rgba(138, 180, 248, 0.18);
+      --caption-active-text: #D2E3FC;
+      --caption-active-border: #8AB4F8;
+      --caption-idle-bg: #181B20;
+      --caption-idle-text: #A8B3C0;
+
+      --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.3);
+      --shadow-md: 0 4px 14px rgba(0, 0, 0, 0.4);
+      --shadow-lg: 0 8px 28px rgba(0, 0, 0, 0.5);
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    body {
+      font-family: var(--font-main);
+      background-color: var(--bg-color);
+      color: var(--text-main);
+      overflow-x: hidden;
+      min-height: 100vh;
+      font-size: 15px;
+      line-height: 1.5;
+      user-select: none;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    /* Screen Layouts */
+    .screen {
+      display: none;
+      min-height: 100vh;
+      width: 100%;
+      max-width: 480px;
+      margin: 0 auto;
+      flex-direction: column;
+      position: relative;
+      background-color: var(--bg-color);
+    }
+
+    .screen.active {
+      display: flex;
+    }
+
+    /* App Header */
+    .app-header {
+      position: sticky;
+      top: 0;
+      z-index: 50;
+      height: var(--header-height);
+      background: var(--surface-color);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 16px;
+      border-bottom: 1px solid var(--border-color);
+      box-shadow: var(--shadow-sm);
+    }
+
+    .header-title-box {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .app-logo {
+      width: 32px;
+      height: 32px;
+      border-radius: 8px;
+      background: var(--primary);
+      color: #FFF;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 700;
+      font-size: 16px;
+    }
+
+    .header-title {
+      font-size: 18px;
+      font-weight: 700;
+      color: var(--text-main);
+      letter-spacing: -0.3px;
+    }
+
+    .icon-btn {
+      background: transparent;
+      border: none;
+      width: 40px;
+      height: 40px;
+      border-radius: var(--radius-full);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: var(--text-secondary);
+      cursor: pointer;
+      transition: background 0.2s, transform 0.1s;
+    }
+
+    .icon-btn:active {
+      background: var(--border-light);
+      transform: scale(0.95);
+    }
+
+    /* Common Content Wrapper */
+    .content-scrollable {
+      flex: 1;
+      overflow-y: auto;
+      padding: 16px;
+      padding-bottom: calc(var(--bottom-nav-height) + var(--safe-bottom) + 24px);
+    }
+
+    /* Video Cards List (Home) */
+    .video-grid {
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+    }
+
+    .section-title-wrap {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 12px;
+    }
+
+    .section-title {
+      font-size: 16px;
+      font-weight: 700;
+      color: var(--text-main);
+    }
+
+    .video-card {
+      background: var(--surface-color);
+      border: 1px solid var(--border-color);
+      border-radius: var(--radius-md);
+      overflow: hidden;
+      cursor: pointer;
+      transition: transform 0.15s, box-shadow 0.15s;
+      box-shadow: var(--shadow-sm);
+    }
+
+    .video-card:active {
+      transform: scale(0.985);
+      box-shadow: none;
+    }
+
+    .thumbnail-wrapper {
+      position: relative;
+      width: 100%;
+      padding-top: 56.25%; /* 16:9 ratio */
+      background: #000;
+    }
+
+    .thumbnail-img {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+
+    .play-overlay-badge {
+      position: absolute;
+      bottom: 8px;
+      right: 8px;
+      background: rgba(0, 0, 0, 0.75);
+      color: #FFF;
+      font-size: 11px;
+      padding: 3px 8px;
+      border-radius: 4px;
+      display: flex;
+      align-items: center;
+      gap: 4px;
+    }
+
+    .video-meta {
+      padding: 12px 14px;
+    }
+
+    .video-title {
+      font-size: 15px;
+      font-weight: 600;
+      color: var(--text-main);
+      line-height: 1.35;
+      margin-bottom: 6px;
+      display: -webkit-box;
+      -webkit-line-clamp: 2;
+      -webkit-box-orient: vertical;
+      overflow: hidden;
+    }
+
+    .video-subtext {
+      font-size: 12px;
+      color: var(--text-secondary);
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    /* Skeleton Loading */
+    .skeleton-card {
+      background: var(--surface-color);
+      border: 1px solid var(--border-color);
+      border-radius: var(--radius-md);
+      overflow: hidden;
+      margin-bottom: 16px;
+    }
+
+    .skeleton-thumb {
+      width: 100%;
+      height: 180px;
+      background: linear-gradient(90deg, var(--surface-elevated) 25%, var(--border-color) 50%, var(--surface-elevated) 75%);
+      background-size: 200% 100%;
+      animation: skeleton-pulse 1.5s infinite;
+    }
+
+    .skeleton-text-1 {
+      height: 16px;
+      width: 80%;
+      margin: 12px;
+      border-radius: 4px;
+      background: var(--border-color);
+    }
+
+    .skeleton-text-2 {
+      height: 12px;
+      width: 40%;
+      margin: 0 12px 12px;
+      border-radius: 4px;
+      background: var(--border-color);
+    }
+
+    @keyframes skeleton-pulse {
+      0% { background-position: 200% 0; }
+      100% { background-position: -200% 0; }
+    }
+
+    /* Empty State */
+    .empty-box {
+      text-align: center;
+      padding: 48px 24px;
+      color: var(--text-secondary);
+    }
+
+    .empty-icon {
+      font-size: 40px;
+      margin-bottom: 12px;
+      color: var(--text-muted);
+    }
+
+    /* Bottom Navigation */
+    .bottom-nav {
+      position: fixed;
+      bottom: 0;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 100%;
+      max-width: 480px;
+      height: calc(var(--bottom-nav-height) + var(--safe-bottom));
+      padding-bottom: var(--safe-bottom);
+      background: var(--surface-color);
+      border-top: 1px solid var(--border-color);
+      display: flex;
+      justify-content: space-around;
+      align-items: center;
+      z-index: 60;
+    }
+
+    .nav-item {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 4px;
+      color: var(--text-secondary);
+      background: none;
+      border: none;
+      font-size: 11px;
+      font-weight: 600;
+      cursor: pointer;
+      height: 100%;
+      transition: color 0.2s;
+    }
+
+    .nav-item.active {
+      color: var(--primary);
+    }
+
+    .nav-item svg {
+      width: 22px;
+      height: 22px;
+      fill: currentColor;
+    }
+
+    /* ========================================================
+       PLAYER SCREEN
+    ======================================================== */
+    .player-header {
+      height: 52px;
+      background: var(--surface-color);
+      display: flex;
+      align-items: center;
+      padding: 0 12px;
+      gap: 12px;
+      border-bottom: 1px solid var(--border-color);
+      position: sticky;
+      top: 0;
+      z-index: 55;
+    }
+
+    .player-header-title {
+      font-size: 15px;
+      font-weight: 600;
+      color: var(--text-main);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      flex: 1;
+    }
+
+    .sticky-player-area {
+      position: sticky;
+      top: 52px;
+      z-index: 50;
+      background: #000;
+      width: 100%;
+      padding-top: 56.25%; /* 16:9 */
+    }
+
+    .youtube-iframe-container {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+    }
+
+    #yt-player-target {
+      width: 100%;
+      height: 100%;
+    }
+
+    /* Captions Container Area */
+    .captions-wrapper {
+      flex: 1;
+      padding: 16px;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      overflow-y: auto;
+      max-height: calc(100vh - 52px - (100vw * 9 / 16));
+      scroll-behavior: smooth;
+      background: var(--bg-color);
+      padding-bottom: 100px;
+    }
+
+    .sync-status-bar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      font-size: 12px;
+      color: var(--text-secondary);
+      padding: 4px 8px;
+      background: var(--surface-color);
+      border-radius: var(--radius-sm);
+      border: 1px solid var(--border-color);
+    }
+
+    .caption-card {
+      background: var(--caption-idle-bg);
+      border: 1.5px solid var(--border-color);
+      border-radius: var(--radius-md);
+      padding: 14px 16px;
+      font-size: 15.5px;
+      line-height: 1.6;
+      color: var(--caption-idle-text);
+      cursor: pointer;
+      transition: all 0.25s cubic-bezier(0.2, 0.8, 0.2, 1);
+      box-shadow: var(--shadow-sm);
+      position: relative;
+    }
+
+    .caption-card:active {
+      transform: scale(0.99);
+    }
+
+    .caption-timestamp {
+      font-size: 11px;
+      font-weight: 600;
+      color: var(--text-muted);
+      margin-bottom: 4px;
+      display: flex;
+      align-items: center;
+      gap: 4px;
+    }
+
+    /* Highlighted active caption state */
+    .caption-card.active {
+      background: var(--caption-active-bg);
+      border-color: var(--caption-active-border);
+      color: var(--caption-active-text);
+      font-weight: 600;
+      font-size: 17px;
+      box-shadow: 0 4px 16px rgba(26, 115, 232, 0.15);
+      transform: scale(1.02);
+      z-index: 2;
+    }
+
+    .caption-card.active .caption-timestamp {
+      color: var(--primary);
+    }
+
+    .caption-gap-indicator {
+      text-align: center;
+      padding: 12px;
+      font-size: 13px;
+      color: var(--text-muted);
+      font-style: italic;
+      background: var(--surface-elevated);
+      border-radius: var(--radius-sm);
+      border: 1px dashed var(--border-color);
+    }
+
+    /* ========================================================
+       SETTINGS SCREEN
+    ======================================================== */
+    .settings-group {
+      background: var(--surface-color);
+      border: 1px solid var(--border-color);
+      border-radius: var(--radius-md);
+      overflow: hidden;
+      margin-bottom: 20px;
+    }
+
+    .settings-group-title {
+      font-size: 13px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      color: var(--text-secondary);
+      padding: 12px 16px 6px;
+    }
+
+    .setting-item {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 14px 16px;
+      border-bottom: 1px solid var(--border-light);
+    }
+
+    .setting-item:last-child {
+      border-bottom: none;
+    }
+
+    .setting-label-box {
+      display: flex;
+      flex-direction: column;
+    }
+
+    .setting-label {
+      font-size: 15px;
+      font-weight: 600;
+      color: var(--text-main);
+    }
+
+    .setting-desc {
+      font-size: 12px;
+      color: var(--text-secondary);
+    }
+
+    .select-dropdown {
+      background: var(--surface-elevated);
+      color: var(--text-main);
+      border: 1px solid var(--border-color);
+      padding: 8px 12px;
+      border-radius: var(--radius-sm);
+      font-size: 14px;
+      font-weight: 500;
+      outline: none;
+    }
+
+    /* ========================================================
+       ADMIN SCREEN & FORMS
+    ======================================================== */
+    .form-group {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      margin-bottom: 16px;
+    }
+
+    .form-label {
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--text-main);
+    }
+
+    .input-text, .textarea-box {
+      width: 100%;
+      background: var(--surface-color);
+      border: 1.5px solid var(--border-color);
+      color: var(--text-main);
+      padding: 12px 14px;
+      border-radius: var(--radius-sm);
+      font-size: 14px;
+      font-family: inherit;
+      outline: none;
+      transition: border-color 0.2s;
+    }
+
+    .input-text:focus, .textarea-box:focus {
+      border-color: var(--primary);
+    }
+
+    .textarea-box {
+      min-height: 120px;
+      font-family: monospace;
+      font-size: 12px;
+      resize: vertical;
+    }
+
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      padding: 12px 20px;
+      border-radius: var(--radius-sm);
+      font-size: 14px;
+      font-weight: 600;
+      border: none;
+      cursor: pointer;
+      transition: all 0.15s;
+    }
+
+    .btn:active {
+      transform: scale(0.98);
+    }
+
+    .btn-primary {
+      background: var(--primary);
+      color: #FFF;
+      box-shadow: var(--shadow-sm);
+    }
+
+    .btn-secondary {
+      background: var(--surface-elevated);
+      color: var(--text-main);
+      border: 1px solid var(--border-color);
+    }
+
+    .btn-danger {
+      background: var(--danger);
+      color: #FFF;
+    }
+
+    .btn-full {
+      width: 100%;
+    }
+
+    .json-validation-status {
+      margin-top: 8px;
+      padding: 10px 12px;
+      border-radius: var(--radius-sm);
+      font-size: 12px;
+      display: none;
+    }
+
+    .json-validation-status.valid {
+      display: block;
+      background: var(--success-light);
+      color: var(--success);
+      border: 1px solid var(--success);
+    }
+
+    .json-validation-status.invalid {
+      display: block;
+      background: var(--danger-light);
+      color: var(--danger);
+      border: 1px solid var(--danger);
+    }
+
+    .admin-video-item {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 12px;
+      background: var(--surface-color);
+      border: 1px solid var(--border-color);
+      border-radius: var(--radius-md);
+      margin-bottom: 12px;
+    }
+
+    .admin-item-thumb {
+      width: 72px;
+      height: 48px;
+      border-radius: 6px;
+      object-fit: cover;
+      background: #000;
+      flex-shrink: 0;
+    }
+
+    .admin-item-info {
+      flex: 1;
+      overflow: hidden;
+    }
+
+    .admin-item-title {
+      font-size: 13.5px;
+      font-weight: 600;
+      color: var(--text-main);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .admin-item-sub {
+      font-size: 11px;
+      color: var(--text-secondary);
+    }
+
+    .admin-actions {
+      display: flex;
+      gap: 4px;
+    }
+
+    /* Modal Styles */
+    .modal-backdrop {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100vw;
+      height: 100vh;
+      background: rgba(0, 0, 0, 0.6);
+      z-index: 100;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+    }
+
+    .modal-backdrop.active {
+      display: flex;
+    }
+
+    .modal-card {
+      background: var(--surface-color);
+      width: 100%;
+      max-width: 360px;
+      border-radius: var(--radius-lg);
+      padding: 20px;
+      box-shadow: var(--shadow-lg);
+      border: 1px solid var(--border-color);
+    }
+
+    .modal-title {
+      font-size: 17px;
+      font-weight: 700;
+      color: var(--text-main);
+      margin-bottom: 8px;
+    }
+
+    .modal-body {
+      font-size: 14px;
+      color: var(--text-secondary);
+      margin-bottom: 20px;
+    }
+
+    .modal-buttons {
+      display: flex;
+      gap: 10px;
+      justify-content: flex-end;
+    }
+
+    /* Toast Notification */
+    #toast {
+      position: fixed;
+      bottom: calc(var(--bottom-nav-height) + 16px);
+      left: 50%;
+      transform: translateX(-50%) translateY(100px);
+      background: #323232;
+      color: #FFF;
+      padding: 10px 18px;
+      border-radius: var(--radius-full);
+      font-size: 13px;
+      font-weight: 500;
+      box-shadow: var(--shadow-md);
+      z-index: 200;
+      transition: transform 0.3s cubic-bezier(0.2, 0.8, 0.2, 1);
+      pointer-events: none;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    #toast.show {
+      transform: translateX(-50%) translateY(0);
+    }
+  </style>
 </head>
 <body>
-    <div class="header">
-        <button class="back-btn" id="backBtn">←</button>
-        <div class="header-title" id="headerTitle">ParaVidhya</div>
-        <div class="header-controls">
-            <button class="btn-icon" id="darkModeBtn" type="button">🌙</button>
-            <button class="btn-icon" id="settingsBtn" type="button">⚙️</button>
+
+  <!-- ========================================================
+       SCREEN 1: HOME SCREEN
+  ======================================================== -->
+  <section id="screen-home" class="screen active">
+    <header class="app-header">
+      <div class="header-title-box">
+        <div class="app-logo">Y</div>
+        <h1 class="header-title">SyncStream</h1>
+      </div>
+      <button class="icon-btn" onclick="App.navigateTo('settings')" aria-label="Settings">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <circle cx="12" cy="12" r="3"></circle>
+          <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path>
+        </svg>
+      </button>
+    </header>
+
+    <div class="content-scrollable">
+      <div class="section-title-wrap">
+        <div class="section-title">सभी वीडियो (All Videos)</div>
+        <span id="video-count-label" style="font-size: 12px; color: var(--text-secondary);">लोड हो रहा है...</span>
+      </div>
+
+      <!-- Video Feed Container -->
+      <div id="home-video-list" class="video-grid">
+        <!-- Skeleton Loaders -->
+        <div class="skeleton-card">
+          <div class="skeleton-thumb"></div>
+          <div class="skeleton-text-1"></div>
+          <div class="skeleton-text-2"></div>
         </div>
+        <div class="skeleton-card">
+          <div class="skeleton-thumb"></div>
+          <div class="skeleton-text-1"></div>
+          <div class="skeleton-text-2"></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ========================================================
+       SCREEN 2: PLAYER SCREEN
+  ======================================================== -->
+  <section id="screen-player" class="screen">
+    <header class="player-header">
+      <button class="icon-btn" onclick="App.navigateTo('home')" aria-label="Back">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+          <path d="M19 12H5M12 19l-7-7 7-7"></path>
+        </svg>
+      </button>
+      <div id="player-screen-title" class="player-header-title">वीडियो प्लेयर</div>
+    </header>
+
+    <!-- YouTube Sticky Frame -->
+    <div class="sticky-player-area">
+      <div class="youtube-iframe-container">
+        <div id="yt-player-target"></div>
+      </div>
     </div>
 
-    <div class="content">
-        <!-- Home Screen -->
-        <div class="screen active" id="homeScreen">
-            <div id="videosList" class="videos-grid"></div>
-            <div id="emptyState" class="empty-state" style="display: none;">
-                <div class="empty-icon">🎬</div>
-                <p>कोई वीडियो नहीं</p>
-            </div>
-            <div id="loadingState" class="loading-state" style="display: none;">
-                <div class="spinner"></div>
-                <div class="loading-text">लोड हो रहा है...</div>
-            </div>
-            <div id="errorState" class="error-state" style="display: none;">
-                <div class="error-icon">⚠️</div>
-                <div class="error-msg" id="errorMsg">कनेक्शन त्रुटि</div>
-                <button class="btn-primary" onclick="app.loadVideos()">फिर से कोशिश करें</button>
-            </div>
-        </div>
-
-        <!-- Player Screen -->
-        <div class="screen" id="playerScreen" class="player-screen">
-            <div class="player-container">
-                <iframe id="ytPlayer" frameborder="0" allow="autoplay" allowfullscreen></iframe>
-            </div>
-            <div style="flex: 1; overflow-y: auto; padding: 16px;">
-                <div id="playerTitle" style="font-size: 16px; font-weight: 600; margin-bottom: 12px;">लोड हो रहा है...</div>
-                <div style="background-color: var(--bg-secondary); border-radius: 8px; padding: 16px; text-align: center;">
-                    कैप्शन यहाँ दिखेंगे...
-                </div>
-            </div>
-        </div>
-
-        <!-- Admin Screen -->
-        <div class="screen" id="adminScreen">
-            <div id="adminMsg"></div>
-
-            <div class="form-section">
-                <h3 id="formTitle">नया वीडियो जोड़ें</h3>
-                
-                <div class="form-group">
-                    <label>वीडियो शीर्षक</label>
-                    <input type="text" id="videoTitle" placeholder="शीर्षक दर्ज करें">
-                </div>
-
-                <div class="form-group">
-                    <label>YouTube URL</label>
-                    <input type="text" id="youtubeUrl" placeholder="https://youtu.be/...">
-                    <small>शॉर्ट या फुल URL दोनों काम करेंगे</small>
-                </div>
-
-                <div class="form-group">
-                    <label>कैप्शन फ़ाइल (JSON)</label>
-                    <input type="file" id="captionsFile" accept=".json">
-                    <small>प्रारूप: [[start, end, "text"], ...]</small>
-                </div>
-
-                <div id="fileStatus" style="color: var(--text-secondary); font-size: 13px; margin-top: 8px;"></div>
-
-                <button class="btn-primary" id="submitBtn" style="width: 100%; margin-top: 12px;">वीडियो जोड़ें</button>
-                <button class="btn-secondary btn-danger" id="cancelBtn" style="display: none;">रद्द करें</button>
-            </div>
-
-            <div class="form-section">
-                <h3>सभी वीडियो</h3>
-                <div id="videosList2"></div>
-                <div id="emptyVideos" class="empty-state" style="display: none; padding: 20px;">
-                    <p>कोई वीडियो नहीं</p>
-                </div>
-            </div>
-        </div>
+    <!-- Live Caption Container -->
+    <div class="sync-status-bar">
+      <span>ऑटो-सिंक चालू है (Auto-Sync Active)</span>
+      <span id="caption-count-badge" style="font-weight: 600;">0/0</span>
     </div>
-
-    <!-- Settings Modal -->
-    <div class="modal-overlay" id="settingsModal">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h2>सेटिंग्स</h2>
-                <button class="close-btn" id="closeSettingsBtn" type="button">✕</button>
-            </div>
-            <div class="toggle-item">
-                <label>डार्क मोड</label>
-                <label class="toggle-switch">
-                    <input type="checkbox" id="darkToggle">
-                    <span class="toggle-slider"></span>
-                </label>
-            </div>
-            <button class="btn-primary" id="adminBtn" type="button" style="width: 100%; margin-top: 16px;">एडमिन पैनल खोलें</button>
-        </div>
+    
+    <div id="captions-container" class="captions-wrapper">
+      <!-- Captions injected via JS -->
     </div>
+  </section>
 
-    <!-- Password Modal -->
-    <div class="password-overlay" id="passwordOverlay">
-        <div class="password-box">
-            <h2>एडमिन पैनल</h2>
-            <input type="password" id="passwordInput" class="password-input" placeholder="पासवर्ड" autocomplete="off">
-            <div class="password-error" id="passError"></div>
-            <button class="btn-primary" id="passBtn" type="button" style="width: 100%;">लॉगिन करें</button>
+  <!-- ========================================================
+       SCREEN 3: SETTINGS SCREEN
+  ======================================================== -->
+  <section id="screen-settings" class="screen">
+    <header class="app-header">
+      <div class="header-title-box">
+        <button class="icon-btn" onclick="App.navigateTo('home')" aria-label="Back">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M19 12H5M12 19l-7-7 7-7"></path>
+          </svg>
+        </button>
+        <h1 class="header-title">सेटिंग्स (Settings)</h1>
+      </div>
+    </header>
+
+    <div class="content-scrollable">
+      <!-- Appearance Group -->
+      <div class="settings-group">
+        <div class="settings-group-title">दिखावट (Appearance)</div>
+        <div class="setting-item">
+          <div class="setting-label-box">
+            <span class="setting-label">थीम (Theme Mode)</span>
+            <span class="setting-desc">डार्क या लाइट मोड चुनें</span>
+          </div>
+          <select id="theme-select" class="select-dropdown" onchange="App.setTheme(this.value)">
+            <option value="dark">डार्क (Dark)</option>
+            <option value="light">लाइट (Light)</option>
+            <option value="system">सिस्टम (System)</option>
+          </select>
         </div>
-    </div>
+      </div>
 
-    <script>
-        const firebaseConfig = {
-            apiKey: "AIzaSyCGHJR74q0Xfj4QQz8uc36Qyb0kBlAI384",
-            authDomain: "paravidhya-ki-paathshala.firebaseapp.com",
-            projectId: "paravidhya-ki-paathshala",
-            storageBucket: "paravidhya-ki-paathshala.firebasestorage.app",
-            messagingSenderId: "69366852667",
-            appId: "1:69366852667:web:9744c3592ced1f5508801e"
+      <!-- Caption Display Group -->
+      <div class="settings-group">
+        <div class="settings-group-title">कैप्शन डिस्प्ले (Caption Mode)</div>
+        <div class="setting-item">
+          <div class="setting-label-box">
+            <span class="setting-label">दृश्यमान कैप्शन (Visible Captions)</span>
+            <span class="setting-desc">स्क्रीन पर एक साथ कितने कैप्शन दिखें</span>
+          </div>
+          <select id="caption-mode-select" class="select-dropdown" onchange="App.setCaptionMode(this.value)">
+            <option value="1">1 कैप्शन (Only Current)</option>
+            <option value="2">2 कैप्शन (Previous & Current)</option>
+            <option value="3" selected>3 कैप्शन (Prev, Current, Next)</option>
+          </select>
+        </div>
+      </div>
+
+      <!-- Administration Button Group -->
+      <div class="settings-group">
+        <div class="settings-group-title">प्रबंधन (Management)</div>
+        <div class="setting-item" style="cursor: pointer;" onclick="App.navigateTo('admin')">
+          <div class="setting-label-box">
+            <span class="setting-label" style="color: var(--primary);">एडमिन पैनल (Admin Panel)</span>
+            <span class="setting-desc">वीडियो जोड़ें, बदलें या हटाएं</span>
+          </div>
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M9 18l6-6-6-6"></path>
+          </svg>
+        </div>
+      </div>
+      
+      <p style="font-size: 11px; text-align: center; color: var(--text-muted); margin-top: 16px;">
+        वर्जन 1.0.0 • सिंगल फ़ाइल प्रोडक्शन बिल्ड
+      </p>
+    </div>
+  </section>
+
+  <!-- ========================================================
+       SCREEN 4: ADMIN PANEL
+  ======================================================== -->
+  <section id="screen-admin" class="screen">
+    <header class="app-header">
+      <div class="header-title-box">
+        <button class="icon-btn" onclick="App.navigateTo('settings')" aria-label="Back">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M19 12H5M12 19l-7-7 7-7"></path>
+          </svg>
+        </button>
+        <h1 class="header-title">एडमिन पैनल (Admin Panel)</h1>
+      </div>
+    </header>
+
+    <div class="content-scrollable">
+      <!-- Add / Edit Form -->
+      <div class="settings-group" style="padding: 16px;">
+        <div class="section-title" id="admin-form-heading" style="margin-bottom: 14px;">नया वीडियो जोड़ें</div>
+        <input type="hidden" id="admin-edit-key" value="">
+
+        <div class="form-group">
+          <label class="form-label" for="admin-title">वीडियो शीर्षक (Title)</label>
+          <input type="text" id="admin-title" class="input-text" placeholder="उदा. गुरुसिया यूनिवर्सल स्टूडियो ध्यान सत्र">
+        </div>
+
+        <div class="form-group">
+          <label class="form-label" for="admin-yt-url">यूट्यूब लिंक (YouTube URL)</label>
+          <input type="text" id="admin-yt-url" class="input-text" placeholder="https://youtu.be/... या https://www.youtube.com/watch?v=...">
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">कैप्शन डेटा (JSON)</label>
+          
+          <div style="display: flex; gap: 8px; margin-bottom: 8px;">
+            <input type="file" id="admin-json-file" accept=".json" style="display: none;" onchange="AdminModule.handleFileUpload(event)">
+            <button type="button" class="btn btn-secondary" style="flex: 1; padding: 8px;" onclick="document.getElementById('admin-json-file').click()">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="17 8 12 3 7 8"></polyline><line x1="12" y1="3" x2="12" y2="15"></line></svg>
+              फ़ाइल अपलोड
+            </button>
+            <button type="button" class="btn btn-secondary" style="flex: 1; padding: 8px;" onclick="AdminModule.validateFromUI()">
+              वैलिडेट करें
+            </button>
+          </div>
+
+          <textarea id="admin-json-text" class="textarea-box" placeholder='[[20.4, 23.4, "ओम"], ...]'></textarea>
+          
+          <div id="json-feedback" class="json-validation-status"></div>
+        </div>
+
+        <div style="display: flex; gap: 10px;">
+          <button id="admin-cancel-btn" type="button" class="btn btn-secondary" style="display: none; flex: 1;" onclick="AdminModule.resetForm()">रद्द करें</button>
+          <button id="admin-save-btn" type="button" class="btn btn-primary btn-full" onclick="AdminModule.saveVideo()">वीडियो सुरक्षित करें</button>
+        </div>
+      </div>
+
+      <!-- Existing Video List -->
+      <div class="section-title-wrap" style="margin-top: 10px;">
+        <div class="section-title">मौजूदा वीडियो (Existing Videos)</div>
+      </div>
+      <div id="admin-video-list">
+        <!-- Injected via JS -->
+      </div>
+    </div>
+  </section>
+
+  <!-- Navigation Bar (Persistent at bottom for quick access) -->
+  <nav class="bottom-nav">
+    <button class="nav-item active" id="nav-home" onclick="App.navigateTo('home')">
+      <svg viewBox="0 0 24 24"><path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z"/></svg>
+      <span>होम</span>
+    </button>
+    <button class="nav-item" id="nav-player" onclick="App.navigateTo('player')">
+      <svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 14.5v-9l6 4.5-6 4.5z"/></svg>
+      <span>प्लेयर</span>
+    </button>
+    <button class="nav-item" id="nav-settings" onclick="App.navigateTo('settings')">
+      <svg viewBox="0 0 24 24"><path d="M19.14 12.94c.04-.3.06-.61.06-.94 0-.32-.02-.64-.07-.94l2.03-1.58c.18-.14.23-.41.12-.61l-1.92-3.32c-.12-.22-.37-.29-.59-.22l-2.39.96c-.5-.38-1.03-.7-1.62-.94l-.36-2.54c-.04-.24-.24-.41-.48-.41h-3.84c-.24 0-.43.17-.47.41l-.36 2.54c-.59.24-1.13.57-1.62.94l-2.39-.96c-.22-.08-.47 0-.59.22L2.74 8.87c-.12.21-.08.47.12.61l2.03 1.58c-.05.3-.09.63-.09.94s.02.64.07.94l-2.03 1.58c-.18.14-.23.41-.12.61l1.92 3.32c.12.22.37.29.59.22l2.39-.96c.5.38 1.03.7 1.62.94l.36 2.54c.05.24.24.41.48.41h3.84c.24 0 .44-.17.47-.41l.36-2.54c.59-.24 1.13-.56 1.62-.94l2.39.96c.22.08.47 0 .59-.22l1.92-3.32c.12-.22.07-.47-.12-.61l-2.01-1.58zM12 15.6c-1.98 0-3.6-1.62-3.6-3.6s1.62-3.6 3.6-3.6 3.6 1.62 3.6 3.6-1.62 3.6-3.6 3.6z"/></svg>
+      <span>सेटिंग्स</span>
+    </button>
+  </nav>
+
+  <!-- Delete Confirmation Modal -->
+  <div id="delete-modal" class="modal-backdrop">
+    <div class="modal-card">
+      <div class="modal-title">वीडियो हटाएं?</div>
+      <div class="modal-body">क्या आप वाकई इस वीडियो और इसके सभी कैप्शन को हटाना चाहते हैं? यह क्रिया वापस नहीं ली जा सकती।</div>
+      <div class="modal-buttons">
+        <button class="btn btn-secondary" onclick="AdminModule.closeDeleteModal()">रद्द करें</button>
+        <button class="btn btn-danger" id="confirm-delete-btn">हटाएं</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Toast Element -->
+  <div id="toast"></div>
+
+  <!-- ========================================================
+       JAVASCRIPT LOGIC
+  ======================================================== -->
+  <script>
+    /**
+     * Firebase Realtime Database Initializer
+     * NOTE: Authentication should be added to Firebase Rules before production deployment.
+     */
+    const firebaseConfig = {
+      apiKey: "AIzaSyCGHJR74qX0fj4QQz8uc36Qyb0kBlAI384",
+      authDomain: "paravidhya-ki-paathshala.firebaseapp.com",
+      projectId: "paravidhya-ki-paathshala",
+      storageBucket: "paravidhya-ki-paathshala.firebasestorage.app",
+      messagingSenderId: "69366852667",
+      appId: "1:69366852667:web:9744c3592ced1f5508801e",
+      databaseURL: "https://paravidhya-ki-paathshala-default-rtdb.firebaseio.com"
+    };
+
+    if (!firebase.apps.length) {
+      firebase.initializeApp(firebaseConfig);
+    }
+    const db = firebase.database();
+    const videosRef = db.ref('videos');
+
+    /**
+     * App Central Controller
+     */
+    const App = {
+      currentScreen: 'home',
+      currentVideo: null,
+      captionMode: localStorage.getItem('captionMode') || '3',
+      currentTheme: localStorage.getItem('appTheme') || 'dark',
+
+      init() {
+        this.applyTheme(this.currentTheme);
+        document.getElementById('theme-select').value = this.currentTheme;
+        document.getElementById('caption-mode-select').value = this.captionMode;
+
+        // Listen for browser back / forward
+        window.addEventListener('popstate', (e) => {
+          const screen = e.state?.screen || 'home';
+          this.showScreen(screen, false);
+        });
+
+        // Initialize Firebase Listeners
+        FirebaseModule.initListeners();
+      },
+
+      setTheme(theme) {
+        this.currentTheme = theme;
+        localStorage.setItem('appTheme', theme);
+        this.applyTheme(theme);
+      },
+
+      applyTheme(theme) {
+        if (theme === 'system') {
+          const isDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+          document.documentElement.setAttribute('data-theme', isDark ? 'dark' : 'light');
+        } else {
+          document.documentElement.setAttribute('data-theme', theme);
+        }
+      },
+
+      setCaptionMode(val) {
+        this.captionMode = val;
+        localStorage.setItem('captionMode', val);
+        CaptionSyncEngine.renderCaptions();
+      },
+
+      navigateTo(screenId) {
+        history.pushState({ screen: screenId }, '', `#${screenId}`);
+        this.showScreen(screenId, false);
+      },
+
+      showScreen(screenId, isInitial = false) {
+        this.currentScreen = screenId;
+        document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+        const target = document.getElementById(`screen-${screenId}`);
+        if (target) target.classList.add('active');
+
+        // Update Bottom Nav Highlighting
+        document.querySelectorAll('.nav-item').forEach(item => item.classList.remove('active'));
+        const navBtn = document.getElementById(`nav-${screenId}`);
+        if (navBtn) navBtn.classList.add('active');
+
+        window.scrollTo(0, 0);
+      },
+
+      showToast(msg) {
+        const toast = document.getElementById('toast');
+        toast.textContent = msg;
+        toast.classList.add('show');
+        setTimeout(() => toast.classList.remove('show'), 3000);
+      }
+    };
+
+    /**
+     * YouTube URL Extracting & Validation
+     */
+    const YouTubeUtils = {
+      extractVideoId(url) {
+        if (!url || typeof url !== 'string') return null;
+        const cleanUrl = url.trim();
+        const regExp = /^.*(youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|\&v=)([^#\&\?]*).*/;
+        const match = cleanUrl.match(regExp);
+        return (match && match[2].length === 11) ? match[2] : null;
+      },
+      getThumbnail(videoId) {
+        return `https://img.youtube.com/vi/${videoId}/hqdefault.jpg`;
+      }
+    };
+
+    /**
+     * Caption Validation Engine
+     */
+    const CaptionValidator = {
+      validate(jsonArray) {
+        if (!Array.isArray(jsonArray)) {
+          return { valid: false, error: 'JSON रूट एक ऐरे (Array) होना चाहिए।' };
+        }
+        if (jsonArray.length === 0) {
+          return { valid: false, error: 'कैप्शन ऐरे खाली है।' };
+        }
+
+        let prevEnd = 0;
+        let overlaps = false;
+
+        for (let i = 0; i < jsonArray.length; i++) {
+          const item = jsonArray[i];
+          if (!Array.isArray(item) || item.length !== 3) {
+            return { valid: false, error: `आइटम #${i + 1} अमान्य है। प्रत्येक आइटम [start, end, "text"] होना चाहिए।` };
+          }
+          const [start, end, text] = item;
+
+          if (typeof start !== 'number' || isNaN(start) || start < 0) {
+            return { valid: false, error: `आइटम #${i + 1} का प्रारंभ समय (Start Time) सकारात्मक संख्या होनी चाहिए।` };
+          }
+          if (typeof end !== 'number' || isNaN(end) || end <= start) {
+            return { valid: false, error: `आइटम #${i + 1} का समाप्ति समय (End Time) प्रारंभ समय से बड़ा होना चाहिए।` };
+          }
+          if (typeof text !== 'string' || !text.trim()) {
+            return { valid: false, error: `आइटम #${i + 1} का टेक्स्ट खाली नहीं हो सकता।` };
+          }
+
+          if (start < prevEnd) {
+            overlaps = true;
+          }
+          prevEnd = end;
+        }
+
+        return {
+          valid: true,
+          count: jsonArray.length,
+          firstTime: jsonArray[0][0],
+          lastTime: jsonArray[jsonArray.length - 1][1],
+          hasOverlapWarning: overlaps
         };
+      }
+    };
 
-        firebase.initializeApp(firebaseConfig);
-        const db = firebase.database();
+    /**
+     * YouTube IFrame Player Instance Manager
+     */
+    let ytPlayer = null;
+    let ytPlayerReady = false;
 
-        const app = {
-            videos: [],
-            isDarkMode: localStorage.getItem('darkMode') === 'true',
-            captionsData: null,
-            editingId: null,
-            loadTimeout: null,
-            
-            init() {
-                this.setupEvents();
-                this.loadDarkMode();
-                this.loadVideos();
-            },
+    window.onYouTubeIframeAPIReady = function() {
+      // Ready trigger
+    };
 
-            setupEvents() {
-                document.getElementById('darkModeBtn').addEventListener('click', () => this.toggleDarkMode());
-                document.getElementById('darkToggle').addEventListener('change', () => this.toggleDarkMode());
-                document.getElementById('settingsBtn').addEventListener('click', () => this.openSettings());
-                document.getElementById('closeSettingsBtn').addEventListener('click', () => this.closeSettings());
-                document.getElementById('adminBtn').addEventListener('click', () => this.openPasswordModal());
-                document.getElementById('passBtn').addEventListener('click', () => this.checkPassword());
-                document.getElementById('backBtn').addEventListener('click', () => this.goHome());
-                document.getElementById('passwordInput').addEventListener('keypress', (e) => {
-                    if (e.key === 'Enter') this.checkPassword();
-                });
-                document.getElementById('submitBtn').addEventListener('click', () => this.saveVideo());
-                document.getElementById('cancelBtn').addEventListener('click', () => this.cancelEdit());
-                document.getElementById('captionsFile').addEventListener('change', (e) => this.handleFileUpload(e));
-            },
+    function initYouTubePlayer(videoId) {
+      if (ytPlayer && ytPlayer.destroy) {
+        ytPlayer.destroy();
+      }
 
-            toggleDarkMode() {
-                this.isDarkMode = !this.isDarkMode;
-                localStorage.setItem('darkMode', this.isDarkMode);
-                this.loadDarkMode();
-            },
-
-            loadDarkMode() {
-                if (this.isDarkMode) {
-                    document.body.classList.add('dark-mode');
-                    document.getElementById('darkToggle').checked = true;
-                    document.getElementById('darkModeBtn').textContent = '☀️';
-                } else {
-                    document.body.classList.remove('dark-mode');
-                    document.getElementById('darkToggle').checked = false;
-                    document.getElementById('darkModeBtn').textContent = '🌙';
-                }
-            },
-
-            showScreen(screenId) {
-                document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
-                document.getElementById(screenId).classList.add('active');
-
-                const backBtn = document.getElementById('backBtn');
-                if (screenId === 'homeScreen') {
-                    backBtn.classList.remove('show');
-                    document.getElementById('headerTitle').textContent = 'ParaVidhya';
-                } else {
-                    backBtn.classList.add('show');
-                    document.getElementById('headerTitle').textContent = screenId === 'playerScreen' ? 'वीडियो' : 'एडमिन';
-                }
-            },
-
-            goHome() {
-                this.showScreen('homeScreen');
-            },
-
-            openSettings() {
-                document.getElementById('settingsModal').classList.add('active');
-            },
-
-            closeSettings() {
-                document.getElementById('settingsModal').classList.remove('active');
-            },
-
-            openPasswordModal() {
-                this.closeSettings();
-                document.getElementById('passwordOverlay').classList.add('active');
-                document.getElementById('passwordInput').value = '';
-                document.getElementById('passError').textContent = '';
-                setTimeout(() => document.getElementById('passwordInput').focus(), 100);
-            },
-
-            checkPassword() {
-                const pass = document.getElementById('passwordInput').value;
-                if (pass === '1234') {
-                    document.getElementById('passwordOverlay').classList.remove('active');
-                    this.showAdminPanel();
-                    this.showScreen('adminScreen');
-                } else {
-                    document.getElementById('passError').textContent = 'गलत पासवर्ड';
-                    document.getElementById('passwordInput').value = '';
-                }
-            },
-
-            showAdminPanel() {
-                this.loadAdminVideos();
-                this.resetForm();
-            },
-
-            handleFileUpload(e) {
-                const file = e.target.files[0];
-                if (!file) return;
-                
-                const reader = new FileReader();
-                reader.onload = (evt) => {
-                    try {
-                        this.captionsData = JSON.parse(evt.target.result);
-                        const count = this.captionsData.length;
-                        document.getElementById('fileStatus').textContent = `✅ ${count} कैप्शन लोड हो गए`;
-                    } catch (error) {
-                        document.getElementById('fileStatus').textContent = '❌ JSON अमान्य है';
-                        this.captionsData = null;
-                    }
-                };
-                reader.readAsText(file);
-            },
-
-            saveVideo() {
-                const title = document.getElementById('videoTitle').value.trim();
-                const url = document.getElementById('youtubeUrl').value.trim();
-
-                if (!title || !url) {
-                    this.showMsg('सभी फ़ील्ड भरें', 'error');
-                    return;
-                }
-
-                const videoId = this.extractVideoId(url);
-                if (!videoId) {
-                    this.showMsg('अमान्य YouTube URL', 'error');
-                    return;
-                }
-
-                if (!this.editingId && !this.captionsData) {
-                    this.showMsg('कैप्शन फ़ाइल अपलोड करें', 'error');
-                    return;
-                }
-
-                const data = {
-                    title,
-                    youtubeUrl: url,
-                    videoId,
-                    captions: this.captionsData || (this.videos.find(v => v.id === this.editingId)?.captions || []),
-                    thumbnail: `https://img.youtube.com/vi/${videoId}/hqdefault.jpg`
-                };
-
-                if (this.editingId) {
-                    db.ref(`videos/${this.editingId}`).update(data).then(() => {
-                        this.showMsg('✅ वीडियो अपडेट हो गया', 'success');
-                        this.resetForm();
-                        this.loadVideos();
-                        this.loadAdminVideos();
-                    }).catch(error => {
-                        this.showMsg('❌ Error', 'error');
-                    });
-                } else {
-                    db.ref('videos').push().set(data).then(() => {
-                        this.showMsg('✅ वीडियो जोड़ा गया', 'success');
-                        this.resetForm();
-                        this.loadVideos();
-                        this.loadAdminVideos();
-                    }).catch(error => {
-                        this.showMsg('❌ Error', 'error');
-                    });
-                }
-            },
-
-            editVideo(id) {
-                const video = this.videos.find(v => v.id === id);
-                if (!video) return;
-                
-                this.editingId = id;
-                document.getElementById('formTitle').textContent = 'वीडियो संपादित करें';
-                document.getElementById('videoTitle').value = video.title;
-                document.getElementById('youtubeUrl').value = video.youtubeUrl;
-                document.getElementById('submitBtn').textContent = 'अपडेट करें';
-                document.getElementById('cancelBtn').style.display = 'block';
-            },
-
-            deleteVideo(id) {
-                if (!confirm('क्या आप यह वीडियो हटाना चाहते हैं?')) return;
-                
-                db.ref(`videos/${id}`).remove().then(() => {
-                    this.showMsg('✅ वीडियो हटा दिया गया', 'success');
-                    this.loadVideos();
-                    this.loadAdminVideos();
-                }).catch(error => {
-                    this.showMsg('❌ Error', 'error');
-                });
-            },
-
-            cancelEdit() {
-                this.resetForm();
-            },
-
-            resetForm() {
-                this.editingId = null;
-                this.captionsData = null;
-                document.getElementById('formTitle').textContent = 'नया वीडियो जोड़ें';
-                document.getElementById('videoTitle').value = '';
-                document.getElementById('youtubeUrl').value = '';
-                document.getElementById('captionsFile').value = '';
-                document.getElementById('fileStatus').textContent = '';
-                document.getElementById('submitBtn').textContent = 'वीडियो जोड़ें';
-                document.getElementById('cancelBtn').style.display = 'none';
-            },
-
-            loadAdminVideos() {
-                const list = document.getElementById('videosList2');
-                const empty = document.getElementById('emptyVideos');
-                
-                if (this.videos.length === 0) {
-                    list.innerHTML = '';
-                    empty.style.display = 'block';
-                    return;
-                }
-
-                empty.style.display = 'none';
-                list.innerHTML = this.videos.map(v => `
-                    <div class="video-item">
-                        <div class="video-item-title">${v.title}</div>
-                        <div class="video-item-actions">
-                            <button class="btn-small btn-edit" onclick="app.editVideo('${v.id}')">संपादित करें</button>
-                            <button class="btn-small btn-delete" onclick="app.deleteVideo('${v.id}')">हटाएं</button>
-                        </div>
-                    </div>
-                `).join('');
-            },
-
-            loadVideos() {
-                const loading = document.getElementById('loadingState');
-                const empty = document.getElementById('emptyState');
-                const error = document.getElementById('errorState');
-                const list = document.getElementById('videosList');
-
-                loading.style.display = 'flex';
-                empty.style.display = 'none';
-                error.style.display = 'none';
-                list.innerHTML = '';
-
-                this.loadTimeout = setTimeout(() => {
-                    loading.style.display = 'none';
-                    error.style.display = 'flex';
-                    document.getElementById('errorMsg').textContent = 'Firebase लोड नहीं हो रहा। इंटरनेट चेक करें।';
-                }, 8000);
-
-                db.ref('videos').once('value', (snapshot) => {
-                    clearTimeout(this.loadTimeout);
-                    loading.style.display = 'none';
-
-                    this.videos = [];
-                    snapshot.forEach(child => {
-                        this.videos.push({ id: child.key, ...child.val() });
-                    });
-
-                    if (this.videos.length === 0) {
-                        empty.style.display = 'block';
-                        list.innerHTML = '';
-                    } else {
-                        empty.style.display = 'none';
-                        this.renderVideos();
-                    }
-                }).catch((err) => {
-                    clearTimeout(this.loadTimeout);
-                    loading.style.display = 'none';
-                    error.style.display = 'flex';
-                    document.getElementById('errorMsg').textContent = 'Firebase Error: ' + err.message;
-                });
-            },
-
-            renderVideos() {
-                const list = document.getElementById('videosList');
-                list.innerHTML = this.videos.map(v => `
-                    <div class="video-card" onclick="app.playVideo('${v.id}')">
-                        <div class="video-thumbnail">
-                            <img src="${v.thumbnail}" alt="${v.title}" onerror="this.style.display='none'">
-                            <div class="play-icon">▶</div>
-                        </div>
-                        <div class="video-info">
-                            <div class="video-title">${v.title}</div>
-                        </div>
-                    </div>
-                `).join('');
-            },
-
-            playVideo(id) {
-                const video = this.videos.find(v => v.id === id);
-                if (!video) return;
-                
-                document.getElementById('playerTitle').textContent = video.title;
-                document.getElementById('ytPlayer').src = `https://www.youtube.com/embed/${video.videoId}?autoplay=1`;
-                this.showScreen('playerScreen');
-            },
-
-            extractVideoId(url) {
-                try {
-                    const u = new URL(url);
-                    if (u.hostname.includes('youtu.be')) {
-                        return u.pathname.substring(1).split('?')[0];
-                    } else if (u.hostname.includes('youtube.com')) {
-                        return u.searchParams.get('v');
-                    }
-                } catch (error) {
-                    return null;
-                }
-                return null;
-            },
-
-            showMsg(msg, type) {
-                const msgEl = document.getElementById('adminMsg');
-                msgEl.innerHTML = `<div class="message ${type}">${msg}</div>`;
-                setTimeout(() => msgEl.innerHTML = '', 3000);
+      ytPlayer = new YT.Player('yt-player-target', {
+        videoId: videoId,
+        playerVars: {
+          playsinline: 1,
+          controls: 1,
+          rel: 0,
+          modestbranding: 1
+        },
+        events: {
+          onReady: (event) => {
+            ytPlayerReady = true;
+            CaptionSyncEngine.startSyncLoop();
+          },
+          onStateChange: (event) => {
+            if (event.data === YT.PlayerState.PLAYING) {
+              CaptionSyncEngine.startSyncLoop();
             }
+          }
+        }
+      });
+    }
+
+    /**
+     * Live Caption Sync Engine
+     */
+    const CaptionSyncEngine = {
+      captions: [],
+      currentIndex: -1,
+      syncInterval: null,
+      isUserInteracting: false,
+      userScrollTimeout: null,
+
+      loadCaptions(captionList) {
+        this.captions = captionList || [];
+        this.currentIndex = -1;
+        this.renderCaptions();
+        this.startSyncLoop();
+      },
+
+      renderCaptions() {
+        const container = document.getElementById('captions-container');
+        container.innerHTML = '';
+
+        if (!this.captions || this.captions.length === 0) {
+          container.innerHTML = `<div class="empty-box">इस वीडियो के लिए कोई कैप्शन उपलब्ध नहीं है।</div>`;
+          return;
+        }
+
+        this.captions.forEach((cap, idx) => {
+          const card = document.createElement('div');
+          card.className = 'caption-card';
+          card.id = `caption-item-${idx}`;
+          card.onclick = () => this.seekToCaption(cap.start);
+
+          const timeFormatted = `${this.formatTime(cap.start)} - ${this.formatTime(cap.end)}`;
+          card.innerHTML = `
+            <div class="caption-timestamp">
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>
+              ${timeFormatted}
+            </div>
+            <div>${this.escapeHTML(cap.text)}</div>
+          `;
+          container.appendChild(card);
+        });
+
+        // User manual scroll detection
+        container.onscroll = () => {
+          this.isUserInteracting = true;
+          clearTimeout(this.userScrollTimeout);
+          this.userScrollTimeout = setTimeout(() => {
+            this.isUserInteracting = false;
+          }, 3000);
+        };
+      },
+
+      startSyncLoop() {
+        if (this.syncInterval) clearInterval(this.syncInterval);
+        this.syncInterval = setInterval(() => this.tick(), 150);
+      },
+
+      tick() {
+        if (!ytPlayer || !ytPlayer.getCurrentTime || !ytPlayerReady) return;
+
+        let currentTime = 0;
+        try {
+          currentTime = ytPlayer.getCurrentTime();
+        } catch(e) {
+          return;
+        }
+
+        const activeIndex = this.findActiveCaptionIndex(currentTime);
+
+        if (activeIndex !== this.currentIndex) {
+          this.currentIndex = activeIndex;
+          this.updateActiveUI(activeIndex);
+        }
+      },
+
+      findActiveCaptionIndex(time) {
+        for (let i = 0; i < this.captions.length; i++) {
+          if (time >= this.captions[i].start && time < this.captions[i].end) {
+            return i;
+          }
+        }
+        return -1;
+      },
+
+      updateActiveUI(index) {
+        // Remove prior active classes
+        document.querySelectorAll('.caption-card.active').forEach(el => el.classList.remove('active'));
+
+        const badge = document.getElementById('caption-count-badge');
+        if (index === -1) {
+          badge.textContent = `- / ${this.captions.length}`;
+          return;
+        }
+
+        badge.textContent = `${index + 1} / ${this.captions.length}`;
+        const activeCard = document.getElementById(`caption-item-${index}`);
+        
+        if (activeCard) {
+          activeCard.classList.add('active');
+
+          // Smooth centering scroll unless user is actively dragging
+          if (!this.isUserInteracting) {
+            activeCard.scrollIntoView({
+              behavior: 'smooth',
+              block: 'center'
+            });
+          }
+        }
+      },
+
+      seekToCaption(seconds) {
+        if (ytPlayer && ytPlayer.seekTo) {
+          ytPlayer.seekTo(seconds, true);
+          ytPlayer.playVideo();
+          this.isUserInteracting = false;
+        }
+      },
+
+      formatTime(seconds) {
+        const mins = Math.floor(seconds / 60);
+        const secs = Math.floor(seconds % 60);
+        return `${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
+      },
+
+      escapeHTML(str) {
+        const div = document.createElement('div');
+        div.textContent = str;
+        return div.innerHTML;
+      }
+    };
+
+    /**
+     * Firebase Data Layer & Demo Data Handler
+     */
+    const FirebaseModule = {
+      videos: {},
+
+      initListeners() {
+        videosRef.on('value', (snapshot) => {
+          const data = snapshot.val();
+          if (data) {
+            this.videos = data;
+            this.renderHomeVideos(data);
+            AdminModule.renderAdminList(data);
+          } else {
+            // Check if demo needs initialization on clean DB
+            this.checkAndSeedDemo();
+          }
+        }, (error) => {
+          App.showToast('फ़ायरबेस कनेक्शन त्रुटि: ' + error.message);
+        });
+      },
+
+      checkAndSeedDemo() {
+        const demoSeeded = localStorage.getItem('demo_seeded_once');
+        if (!demoSeeded) {
+          const demoKey = videosRef.push().key;
+          const initialCaptions = [
+            { start: 20.4, end: 23.4, text: "ओम" },
+            { start: 89.92, end: 94.32, text: "जय गुरुदेव आप सबको एक बार फिर से इस नए एपिसोड में जिसका नाम है गुरुसिया यूनिवर्सल स्टूडियो ध्यान सत्र आज तारीख है 18 अगस्त सन 2026 और वार है मंगलवार।" },
+            { start: 94.32, end: 96.32, text: "सबको बहुत-बहुत जय गुरुदेव। जय दादा गुरुदेव।" },
+            { start: 96.32, end: 99.759, text: "यह प्लेटफार्म समर्थ सदगुरुदेव श्री रामलाल जी सिया और उनके मुक्ति दाता गुरु परम शिव बाबा श्री गंगाईनाथ जी योगी का है।" },
+            { start: 99.759, end: 101.759, text: "सब आत्माओं की मुक्ति के लिए" }
+          ];
+
+          const demoData = {
+            title: "डेमो: गुरुसिया यूनिवर्सल स्टूडियो ध्यान सत्र",
+            youtubeId: "apAK-zjvN9s",
+            captions: initialCaptions,
+            createdAt: Date.now()
+          };
+
+          videosRef.child(demoKey).set(demoData).then(() => {
+            localStorage.setItem('demo_seeded_once', 'true');
+          });
+        } else {
+          this.renderHomeVideos({});
+          AdminModule.renderAdminList({});
+        }
+      },
+
+      renderHomeVideos(videosObj) {
+        const container = document.getElementById('home-video-list');
+        const countLabel = document.getElementById('video-count-label');
+        const keys = Object.keys(videosObj);
+
+        countLabel.textContent = `${keys.length} वीडियो उपलब्ध`;
+        container.innerHTML = '';
+
+        if (keys.length === 0) {
+          container.innerHTML = `
+            <div class="empty-box">
+              <div class="empty-icon">📺</div>
+              <h3>कोई वीडियो नहीं मिला</h3>
+              <p style="font-size: 13px; margin-top: 6px;">एडमिन पैनल से नया वीडियो जोड़ें।</p>
+            </div>
+          `;
+          return;
+        }
+
+        keys.forEach(key => {
+          const v = videosObj[key];
+          const card = document.createElement('div');
+          card.className = 'video-card';
+          card.onclick = () => {
+            App.currentVideo = { key, ...v };
+            document.getElementById('player-screen-title').textContent = v.title;
+            App.navigateTo('player');
+            initYouTubePlayer(v.youtubeId);
+            CaptionSyncEngine.loadCaptions(v.captions);
+          };
+
+          const thumb = YouTubeUtils.getThumbnail(v.youtubeId);
+          const captionCount = v.captions ? (Array.isArray(v.captions) ? v.captions.length : Object.keys(v.captions).length) : 0;
+
+          card.innerHTML = `
+            <div class="thumbnail-wrapper">
+              <img src="${thumb}" class="thumbnail-img" alt="${v.title}" loading="lazy">
+              <div class="play-overlay-badge">
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg>
+                प्ले करें
+              </div>
+            </div>
+            <div class="video-meta">
+              <div class="video-title">${CaptionSyncEngine.escapeHTML(v.title)}</div>
+              <div class="video-subtext">
+                <span>💬 ${captionCount} कैप्शन</span>
+              </div>
+            </div>
+          `;
+          container.appendChild(card);
+        });
+      }
+    };
+
+    /**
+     * Admin Module
+     */
+    const AdminModule = {
+      pendingDeleteKey: null,
+
+      handleFileUpload(event) {
+        const file = event.target.files[0];
+        if (!file) return;
+
+        const reader = new FileReader();
+        reader.onload = (e) => {
+          const content = e.target.result;
+          document.getElementById('admin-json-text').value = content;
+          this.validateFromUI();
+        };
+        reader.readAsText(file);
+      },
+
+      validateFromUI() {
+        const text = document.getElementById('admin-json-text').value.trim();
+        const feedback = document.getElementById('json-feedback');
+
+        if (!text) {
+          feedback.className = 'json-validation-status invalid';
+          feedback.textContent = 'कृपया मान्य JSON डेटा प्रदान करें।';
+          return null;
+        }
+
+        try {
+          const parsed = JSON.parse(text);
+          const res = CaptionValidator.validate(parsed);
+
+          if (res.valid) {
+            feedback.className = 'json-validation-status valid';
+            feedback.innerHTML = `✓ वैध JSON • कुल कैप्शन: ${res.count} • समयावधि: ${res.firstTime}s से ${res.lastTime}s`;
+            return parsed;
+          } else {
+            feedback.className = 'json-validation-status invalid';
+            feedback.textContent = 'त्रुटि: ' + res.error;
+            return null;
+          }
+        } catch (e) {
+          feedback.className = 'json-validation-status invalid';
+          feedback.textContent = 'अमान्य JSON प्रारूप: ' + e.message;
+          return null;
+        }
+      },
+
+      saveVideo() {
+        const title = document.getElementById('admin-title').value.trim();
+        const url = document.getElementById('admin-yt-url').value.trim();
+        const editKey = document.getElementById('admin-edit-key').value;
+
+        if (!title) {
+          App.showToast('कृपया वीडियो का शीर्षक भरें');
+          return;
+        }
+
+        const ytId = YouTubeUtils.extractVideoId(url);
+        if (!ytId) {
+          App.showToast('अमान्य यूट्यूब लिंक');
+          return;
+        }
+
+        const parsedJson = this.validateFromUI();
+        if (!parsedJson) {
+          App.showToast('कृपया पहले JSON को सही करें');
+          return;
+        }
+
+        // Transform array [start, end, text] into object structure
+        const formattedCaptions = parsedJson.map(item => ({
+          start: item[0],
+          end: item[1],
+          text: item[2]
+        }));
+
+        const saveBtn = document.getElementById('admin-save-btn');
+        saveBtn.disabled = true;
+        saveBtn.textContent = 'सुरक्षित हो रहा है...';
+
+        const payload = {
+          title,
+          youtubeId: ytId,
+          captions: formattedCaptions,
+          updatedAt: Date.now()
         };
 
-        app.init();
-    </script>
+        if (editKey) {
+          // Update
+          videosRef.child(editKey).update(payload).then(() => {
+            App.showToast('वीडियो सफलतापूर्वक अपडेट हुआ!');
+            this.resetForm();
+          }).catch(err => {
+            App.showToast('त्रुटि: ' + err.message);
+          }).finally(() => {
+            saveBtn.disabled = false;
+            saveBtn.textContent = 'वीडियो सुरक्षित करें';
+          });
+        } else {
+          // Insert
+          payload.createdAt = Date.now();
+          const newRef = videosRef.push();
+          newRef.set(payload).then(() => {
+            App.showToast('नया वीडियो जोड़ा गया!');
+            this.resetForm();
+          }).catch(err => {
+            App.showToast('त्रुटि: ' + err.message);
+          }).finally(() => {
+            saveBtn.disabled = false;
+            saveBtn.textContent = 'वीडियो सुरक्षित करें';
+          });
+        }
+      },
+
+      renderAdminList(videosObj) {
+        const container = document.getElementById('admin-video-list');
+        container.innerHTML = '';
+
+        const keys = Object.keys(videosObj);
+        if (keys.length === 0) {
+          container.innerHTML = `<p style="font-size: 13px; color: var(--text-muted);">कोई वीडियो उपलब्ध नहीं है।</p>`;
+          return;
+        }
+
+        keys.forEach(key => {
+          const v = videosObj[key];
+          const item = document.createElement('div');
+          item.className = 'admin-video-item';
+
+          const thumb = YouTubeUtils.getThumbnail(v.youtubeId);
+          item.innerHTML = `
+            <img src="${thumb}" class="admin-item-thumb" alt="">
+            <div class="admin-item-info">
+              <div class="admin-item-title">${CaptionSyncEngine.escapeHTML(v.title)}</div>
+              <div class="admin-item-sub">ID: ${v.youtubeId}</div>
+            </div>
+            <div class="admin-actions">
+              <button class="icon-btn" onclick="AdminModule.editVideo('${key}')" title="बदलें">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path></svg>
+              </button>
+              <button class="icon-btn" style="color: var(--danger);" onclick="AdminModule.promptDelete('${key}')" title="हटाएं">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg>
+              </button>
+            </div>
+          `;
+          container.appendChild(item);
+        });
+      },
+
+      editVideo(key) {
+        const v = FirebaseModule.videos[key];
+        if (!v) return;
+
+        document.getElementById('admin-edit-key').value = key;
+        document.getElementById('admin-title').value = v.title;
+        document.getElementById('admin-yt-url').value = `https://youtu.be/${v.youtubeId}`;
+        
+        // Reconstruct array format for editor
+        const rawArray = (v.captions || []).map(c => [c.start, c.end, c.text]);
+        document.getElementById('admin-json-text').value = JSON.stringify(rawArray, null, 2);
+
+        document.getElementById('admin-form-heading').textContent = 'वीडियो संपादित करें (Edit Video)';
+        document.getElementById('admin-cancel-btn').style.display = 'inline-flex';
+        this.validateFromUI();
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+      },
+
+      resetForm() {
+        document.getElementById('admin-edit-key').value = '';
+        document.getElementById('admin-title').value = '';
+        document.getElementById('admin-yt-url').value = '';
+        document.getElementById('admin-json-text').value = '';
+        document.getElementById('admin-form-heading').textContent = 'नया वीडियो जोड़ें';
+        document.getElementById('admin-cancel-btn').style.display = 'none';
+        document.getElementById('json-feedback').className = 'json-validation-status';
+        document.getElementById('json-feedback').style.display = 'none';
+      },
+
+      promptDelete(key) {
+        this.pendingDeleteKey = key;
+        document.getElementById('delete-modal').classList.add('active');
+        document.getElementById('confirm-delete-btn').onclick = () => this.confirmDelete();
+      },
+
+      closeDeleteModal() {
+        this.pendingDeleteKey = null;
+        document.getElementById('delete-modal').classList.remove('active');
+      },
+
+      confirmDelete() {
+        if (!this.pendingDeleteKey) return;
+        videosRef.child(this.pendingDeleteKey).remove().then(() => {
+          App.showToast('वीडियो हटा दिया गया!');
+          this.closeDeleteModal();
+        }).catch(err => {
+          App.showToast('हटाने में त्रुटि: ' + err.message);
+        });
+      }
+    };
+
+    // Initialize App on DOM Load
+    document.addEventListener('DOMContentLoaded', () => {
+      App.init();
+    });
+  </script>
 </body>
 </html>

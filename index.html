@@ -173,11 +173,13 @@
             margin-bottom: 12px;
         }
 
-        .loading {
+        .loading-state {
             display: flex;
+            flex-direction: column;
             justify-content: center;
             align-items: center;
             height: 100%;
+            gap: 20px;
         }
 
         .spinner {
@@ -192,6 +194,42 @@
         @keyframes spin {
             0% { transform: rotate(0deg); }
             100% { transform: rotate(360deg); }
+        }
+
+        .loading-text {
+            font-size: 14px;
+            color: var(--text-secondary);
+        }
+
+        .error-state {
+            text-align: center;
+            padding: 40px 20px;
+        }
+
+        .error-icon {
+            font-size: 48px;
+            margin-bottom: 12px;
+        }
+
+        .error-msg {
+            color: #ff4757;
+            margin-bottom: 16px;
+            font-size: 14px;
+        }
+
+        .btn-primary {
+            padding: 12px 24px;
+            background-color: var(--accent-color);
+            color: white;
+            border: none;
+            border-radius: 6px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+        }
+
+        .btn-primary:active {
+            opacity: 0.8;
         }
 
         .player-screen {
@@ -338,23 +376,6 @@
             transform: translateX(22px);
         }
 
-        .btn-primary {
-            width: 100%;
-            padding: 12px;
-            background-color: var(--accent-color);
-            color: white;
-            border: none;
-            border-radius: 6px;
-            font-size: 14px;
-            font-weight: 600;
-            cursor: pointer;
-            margin-top: 16px;
-        }
-
-        .btn-primary:active {
-            opacity: 0.8;
-        }
-
         .password-overlay {
             display: none;
             position: fixed;
@@ -407,7 +428,7 @@
             min-height: 18px;
         }
 
-        /* Admin Panel Styles */
+        /* Admin Panel */
         .form-section {
             background-color: var(--bg-secondary);
             border-radius: 8px;
@@ -546,14 +567,16 @@
             <div id="videosList" class="videos-grid"></div>
             <div id="emptyState" class="empty-state" style="display: none;">
                 <div class="empty-icon">🎬</div>
-                <p style="margin-bottom: 20px;">कोई वीडियो नहीं</p>
-                <p style="font-size: 13px; color: var(--text-secondary); line-height: 1.6;">
-                    पहली वीडियो जोड़ने के लिए:<br><br>
-                    ⚙️ Settings → एडमिन पैनल → पासवर्ड: <strong>1234</strong>
-                </p>
+                <p>कोई वीडियो नहीं</p>
             </div>
-            <div id="loadingState" class="loading">
+            <div id="loadingState" class="loading-state" style="display: none;">
                 <div class="spinner"></div>
+                <div class="loading-text">लोड हो रहा है...</div>
+            </div>
+            <div id="errorState" class="error-state" style="display: none;">
+                <div class="error-icon">⚠️</div>
+                <div class="error-msg" id="errorMsg">कनेक्शन त्रुटि</div>
+                <button class="btn-primary" onclick="app.loadVideos()">फिर से कोशिश करें</button>
             </div>
         </div>
 
@@ -574,7 +597,6 @@
         <div class="screen" id="adminScreen">
             <div id="adminMsg"></div>
 
-            <!-- Add/Edit Video Form -->
             <div class="form-section">
                 <h3 id="formTitle">नया वीडियो जोड़ें</h3>
                 
@@ -597,11 +619,10 @@
 
                 <div id="fileStatus" style="color: var(--text-secondary); font-size: 13px; margin-top: 8px;"></div>
 
-                <button class="btn-primary" id="submitBtn">वीडियो जोड़ें</button>
+                <button class="btn-primary" id="submitBtn" style="width: 100%; margin-top: 12px;">वीडियो जोड़ें</button>
                 <button class="btn-secondary btn-danger" id="cancelBtn" style="display: none;">रद्द करें</button>
             </div>
 
-            <!-- Videos List -->
             <div class="form-section">
                 <h3>सभी वीडियो</h3>
                 <div id="videosList2"></div>
@@ -626,7 +647,7 @@
                     <span class="toggle-slider"></span>
                 </label>
             </div>
-            <button class="btn-primary" id="adminBtn" type="button">एडमिन पैनल खोलें</button>
+            <button class="btn-primary" id="adminBtn" type="button" style="width: 100%; margin-top: 16px;">एडमिन पैनल खोलें</button>
         </div>
     </div>
 
@@ -636,13 +657,11 @@
             <h2>एडमिन पैनल</h2>
             <input type="password" id="passwordInput" class="password-input" placeholder="पासवर्ड" autocomplete="off">
             <div class="password-error" id="passError"></div>
-            <button class="btn-primary" id="passBtn" type="button">लॉगिन करें</button>
+            <button class="btn-primary" id="passBtn" type="button" style="width: 100%;">लॉगिन करें</button>
         </div>
     </div>
 
     <script>
-        console.log('✅ App Starting...');
-
         const firebaseConfig = {
             apiKey: "AIzaSyCGHJR74q0Xfj4QQz8uc36Qyb0kBlAI384",
             authDomain: "paravidhya-ki-paathshala.firebaseapp.com",
@@ -660,9 +679,9 @@
             isDarkMode: localStorage.getItem('darkMode') === 'true',
             captionsData: null,
             editingId: null,
+            loadTimeout: null,
             
             init() {
-                console.log('🚀 Initializing app...');
                 this.setupEvents();
                 this.loadDarkMode();
                 this.loadVideos();
@@ -682,14 +701,12 @@
                 document.getElementById('submitBtn').addEventListener('click', () => this.saveVideo());
                 document.getElementById('cancelBtn').addEventListener('click', () => this.cancelEdit());
                 document.getElementById('captionsFile').addEventListener('change', (e) => this.handleFileUpload(e));
-                console.log('✅ Events setup complete');
             },
 
             toggleDarkMode() {
                 this.isDarkMode = !this.isDarkMode;
                 localStorage.setItem('darkMode', this.isDarkMode);
                 this.loadDarkMode();
-                console.log('Dark mode:', this.isDarkMode);
             },
 
             loadDarkMode() {
@@ -716,7 +733,6 @@
                     backBtn.classList.add('show');
                     document.getElementById('headerTitle').textContent = screenId === 'playerScreen' ? 'वीडियो' : 'एडमिन';
                 }
-                console.log('Screen changed to:', screenId);
             },
 
             goHome() {
@@ -725,12 +741,10 @@
 
             openSettings() {
                 document.getElementById('settingsModal').classList.add('active');
-                console.log('Settings opened');
             },
 
             closeSettings() {
                 document.getElementById('settingsModal').classList.remove('active');
-                console.log('Settings closed');
             },
 
             openPasswordModal() {
@@ -739,20 +753,15 @@
                 document.getElementById('passwordInput').value = '';
                 document.getElementById('passError').textContent = '';
                 setTimeout(() => document.getElementById('passwordInput').focus(), 100);
-                console.log('Password modal opened');
             },
 
             checkPassword() {
                 const pass = document.getElementById('passwordInput').value;
-                console.log('Password check:', pass);
-                
                 if (pass === '1234') {
-                    console.log('✅ Correct password!');
                     document.getElementById('passwordOverlay').classList.remove('active');
                     this.showAdminPanel();
                     this.showScreen('adminScreen');
                 } else {
-                    console.log('❌ Wrong password');
                     document.getElementById('passError').textContent = 'गलत पासवर्ड';
                     document.getElementById('passwordInput').value = '';
                 }
@@ -773,11 +782,9 @@
                         this.captionsData = JSON.parse(evt.target.result);
                         const count = this.captionsData.length;
                         document.getElementById('fileStatus').textContent = `✅ ${count} कैप्शन लोड हो गए`;
-                        console.log('✅ Captions loaded:', count);
                     } catch (error) {
                         document.getElementById('fileStatus').textContent = '❌ JSON अमान्य है';
                         this.captionsData = null;
-                        console.error('JSON Error:', error);
                     }
                 };
                 reader.readAsText(file);
@@ -818,7 +825,7 @@
                         this.loadVideos();
                         this.loadAdminVideos();
                     }).catch(error => {
-                        this.showMsg('❌ Error: ' + error.message, 'error');
+                        this.showMsg('❌ Error', 'error');
                     });
                 } else {
                     db.ref('videos').push().set(data).then(() => {
@@ -827,7 +834,7 @@
                         this.loadVideos();
                         this.loadAdminVideos();
                     }).catch(error => {
-                        this.showMsg('❌ Error: ' + error.message, 'error');
+                        this.showMsg('❌ Error', 'error');
                     });
                 }
             },
@@ -842,7 +849,6 @@
                 document.getElementById('youtubeUrl').value = video.youtubeUrl;
                 document.getElementById('submitBtn').textContent = 'अपडेट करें';
                 document.getElementById('cancelBtn').style.display = 'block';
-                console.log('Editing video:', id);
             },
 
             deleteVideo(id) {
@@ -853,7 +859,7 @@
                     this.loadVideos();
                     this.loadAdminVideos();
                 }).catch(error => {
-                    this.showMsg('❌ Error: ' + error.message, 'error');
+                    this.showMsg('❌ Error', 'error');
                 });
             },
 
@@ -893,23 +899,33 @@
                         </div>
                     </div>
                 `).join('');
-                console.log('Admin videos loaded');
             },
 
             loadVideos() {
-                console.log('📥 Loading videos from Firebase...');
                 const loading = document.getElementById('loadingState');
                 const empty = document.getElementById('emptyState');
+                const error = document.getElementById('errorState');
                 const list = document.getElementById('videosList');
 
+                loading.style.display = 'flex';
+                empty.style.display = 'none';
+                error.style.display = 'none';
+                list.innerHTML = '';
+
+                this.loadTimeout = setTimeout(() => {
+                    loading.style.display = 'none';
+                    error.style.display = 'flex';
+                    document.getElementById('errorMsg').textContent = 'Firebase लोड नहीं हो रहा। इंटरनेट चेक करें।';
+                }, 8000);
+
                 db.ref('videos').once('value', (snapshot) => {
+                    clearTimeout(this.loadTimeout);
+                    loading.style.display = 'none';
+
                     this.videos = [];
                     snapshot.forEach(child => {
                         this.videos.push({ id: child.key, ...child.val() });
                     });
-                    
-                    console.log('✅ Videos loaded:', this.videos.length);
-                    loading.style.display = 'none';
 
                     if (this.videos.length === 0) {
                         empty.style.display = 'block';
@@ -918,11 +934,11 @@
                         empty.style.display = 'none';
                         this.renderVideos();
                     }
-                }).catch((error) => {
-                    console.error('❌ Firebase error:', error);
+                }).catch((err) => {
+                    clearTimeout(this.loadTimeout);
                     loading.style.display = 'none';
-                    empty.style.display = 'block';
-                    empty.innerHTML = '<div class="empty-icon">⚠️</div><p>डेटा लोड नहीं हो सका</p>';
+                    error.style.display = 'flex';
+                    document.getElementById('errorMsg').textContent = 'Firebase Error: ' + err.message;
                 });
             },
 
@@ -939,17 +955,12 @@
                         </div>
                     </div>
                 `).join('');
-                console.log('✅ Videos rendered');
             },
 
             playVideo(id) {
                 const video = this.videos.find(v => v.id === id);
-                if (!video) {
-                    console.error('Video not found:', id);
-                    return;
-                }
+                if (!video) return;
                 
-                console.log('Playing video:', video.title);
                 document.getElementById('playerTitle').textContent = video.title;
                 document.getElementById('ytPlayer').src = `https://www.youtube.com/embed/${video.videoId}?autoplay=1`;
                 this.showScreen('playerScreen');
@@ -976,7 +987,6 @@
             }
         };
 
-        // Start
         app.init();
     </script>
 </body>

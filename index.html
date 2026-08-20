@@ -482,16 +482,150 @@
     .caption-card.active {
       background: var(--caption-active-bg);
       border-color: var(--caption-active-border);
-      color: var(--caption-active-text);
-      font-weight: 600;
-      font-size: 17px;
       box-shadow: 0 4px 16px rgba(26, 115, 232, 0.15);
-      transform: scale(1.02);
+      transform: scale(1.01);
       z-index: 2;
     }
 
     .caption-card.active .caption-timestamp {
       color: var(--primary);
+    }
+
+    /* Speaker Badges & Line Highlighting */
+    .speaker-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      background: var(--surface-elevated);
+      color: var(--primary);
+      font-size: 12px;
+      font-weight: 700;
+      padding: 3px 10px;
+      border-radius: var(--radius-full);
+      margin-bottom: 8px;
+      border: 1px solid var(--border-color);
+    }
+
+    .speaker-input {
+      width: 100%;
+      background: var(--surface-elevated);
+      border: 1.5px dashed var(--border-color);
+      color: var(--text-main);
+      padding: 6px 10px;
+      border-radius: var(--radius-sm);
+      font-size: 13px;
+      font-weight: 600;
+      margin-bottom: 10px;
+      outline: none;
+      user-select: text;
+      -webkit-user-select: text;
+    }
+    .speaker-input:focus {
+      border-color: var(--primary);
+      background: var(--surface-color);
+    }
+
+    .caption-line {
+      display: inline;
+      padding: 1px 0px;
+      border-radius: 4px;
+      transition: background 0.2s, color 0.2s;
+      -webkit-box-decoration-break: clone;
+      box-decoration-break: clone;
+    }
+
+    .caption-line.editable-line {
+      border-bottom: 1.5px dashed var(--primary);
+      outline: none;
+      cursor: text;
+      user-select: text;
+      -webkit-user-select: text;
+      padding: 1px 3px;
+    }
+
+    .caption-line.editable-line:focus {
+      background: var(--primary-light);
+      border-bottom: 2px solid var(--primary);
+      border-radius: 4px;
+    }
+
+    .autosave-pill {
+      font-size: 11px;
+      font-weight: 600;
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      color: var(--text-secondary);
+      transition: color 0.3s;
+    }
+    .autosave-pill.saving {
+      color: var(--warning);
+    }
+    .autosave-pill.saved {
+      color: var(--success);
+    }
+
+    .caption-line.active-line {
+      background: var(--primary);
+      color: #FFFFFF !important;
+      font-weight: 700;
+      border-radius: 4px;
+      padding: 2px 6px;
+    }
+
+    /* Live Edit Controls */
+    .caption-edit-bar {
+      display: flex;
+      align-items: center;
+      justify-content: flex-end;
+      gap: 8px;
+      margin-top: 10px;
+      padding-top: 8px;
+      border-top: 1px dashed var(--border-color);
+    }
+
+    .btn-mini {
+      background: var(--surface-elevated);
+      border: 1px solid var(--border-color);
+      color: var(--text-main);
+      font-size: 11px;
+      font-weight: 600;
+      padding: 4px 10px;
+      border-radius: var(--radius-sm);
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+    }
+    .btn-mini:hover, .btn-mini:active {
+      background: var(--primary-light);
+      color: var(--primary);
+      border-color: var(--primary);
+    }
+
+    .player-save-floating-bar {
+      position: fixed;
+      bottom: calc(var(--bottom-nav-height) + var(--safe-bottom) + 12px);
+      left: 50%;
+      transform: translateX(-50%);
+      z-index: 65;
+      display: none;
+      box-shadow: var(--shadow-lg);
+      border-radius: var(--radius-full);
+    }
+    .player-save-floating-bar.show {
+      display: block;
+      animation: floatUp 0.3s ease;
+    }
+
+    .icon-btn.active-mode {
+      background: var(--primary-light);
+      color: var(--primary);
+    }
+
+    @keyframes floatUp {
+      from { transform: translateX(-50%) translateY(20px); opacity: 0; }
+      to { transform: translateX(-50%) translateY(0); opacity: 1; }
     }
 
     .caption-gap-indicator {
@@ -503,6 +637,49 @@
       background: var(--surface-elevated);
       border-radius: var(--radius-sm);
       border: 1px dashed var(--border-color);
+    }
+
+    /* Admin Accordion Structure */
+    .admin-accordion-btn {
+      width: 100%;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 15px 16px;
+      background: var(--surface-color);
+      border: 1.5px solid var(--border-color);
+      border-radius: var(--radius-md);
+      color: var(--text-main);
+      font-size: 14px;
+      font-weight: 700;
+      cursor: pointer;
+      margin-bottom: 12px;
+      transition: all 0.2s;
+    }
+    .admin-accordion-btn.active {
+      border-color: var(--primary);
+      background: var(--surface-elevated);
+      border-bottom-left-radius: 0;
+      border-bottom-right-radius: 0;
+      margin-bottom: 0;
+    }
+    .admin-accordion-content {
+      display: none;
+      background: var(--surface-color);
+      border: 1.5px solid var(--border-color);
+      border-top: none;
+      border-bottom-left-radius: var(--radius-md);
+      border-bottom-right-radius: var(--radius-md);
+      padding: 16px;
+      margin-bottom: 14px;
+    }
+    .admin-accordion-content.open {
+      display: block;
+      animation: fadeIn 0.2s ease;
+    }
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(-4px); }
+      to { opacity: 1; transform: translateY(0); }
     }
 
     /* ========================================================
@@ -791,14 +968,11 @@
   <section id="screen-home" class="screen active">
     <header class="app-header">
       <div class="header-title-box">
-        <div class="app-logo">Y</div>
-        <h1 class="header-title">SyncStream</h1>
+        <div class="app-logo">प</div>
+        <h1 class="header-title">परा विद्या की पाठशाला</h1>
       </div>
-      <button class="icon-btn" onclick="App.navigateTo('settings')" aria-label="Settings">
-        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-          <circle cx="12" cy="12" r="3"></circle>
-          <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path>
-        </svg>
+      <button class="icon-btn theme-toggle-btn" onclick="App.toggleTheme()" aria-label="थीम बदलें">
+        <!-- Injected via JS -->
       </button>
     </header>
 
@@ -836,7 +1010,18 @@
         </svg>
       </button>
       <div id="player-screen-title" class="player-header-title">वीडियो प्लेयर</div>
+      <button class="icon-btn theme-toggle-btn" onclick="App.toggleTheme()" aria-label="थीम बदलें">
+        <!-- Injected via JS -->
+      </button>
     </header>
+
+    <!-- Floating Live Save Bar -->
+    <div id="player-save-floating-bar" class="player-save-floating-bar">
+      <button class="btn btn-primary" style="padding: 10px 22px; border-radius: var(--radius-full);" onclick="CaptionSyncEngine.saveLiveChanges()">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"></path><polyline points="17 21 17 13 7 13 7 21"></polyline><polyline points="7 3 7 8 15 8"></polyline></svg>
+        बदलाव सुरक्षित करें (Save)
+      </button>
+    </div>
 
     <!-- YouTube Sticky Frame -->
     <div class="sticky-player-area">
@@ -847,7 +1032,10 @@
 
     <!-- Live Caption Container -->
     <div class="sync-status-bar">
-      <span>ऑटो-सिंक चालू है (Auto-Sync Active)</span>
+      <div style="display: flex; align-items: center; gap: 8px;">
+        <span>ऑटो-सिंक चालू</span>
+        <span id="autosave-status" class="autosave-pill saved">✓ सुरक्षित</span>
+      </div>
       <span id="caption-count-badge" style="font-weight: 600;">0/0</span>
     </div>
     
@@ -872,22 +1060,6 @@
     </header>
 
     <div class="content-scrollable">
-      <!-- Appearance Group -->
-      <div class="settings-group">
-        <div class="settings-group-title">दिखावट (Appearance)</div>
-        <div class="setting-item">
-          <div class="setting-label-box">
-            <span class="setting-label">थीम (Theme Mode)</span>
-            <span class="setting-desc">डार्क या लाइट मोड चुनें</span>
-          </div>
-          <select id="theme-select" class="select-dropdown" onchange="App.setTheme(this.value)">
-            <option value="dark">डार्क (Dark)</option>
-            <option value="light">लाइट (Light)</option>
-            <option value="system">सिस्टम (System)</option>
-          </select>
-        </div>
-      </div>
-
       <!-- Caption Display Group -->
       <div class="settings-group">
         <div class="settings-group-title">कैप्शन डिस्प्ले (Caption Mode)</div>
@@ -910,7 +1082,7 @@
         <div class="setting-item" style="cursor: pointer;" onclick="App.navigateTo('admin')">
           <div class="setting-label-box">
             <span class="setting-label" style="color: var(--primary);">एडमिन पैनल (Admin Panel)</span>
-            <span class="setting-desc">वीडियो जोड़ें, बदलें या हटाएं</span>
+            <span class="setting-desc">लेआउट एडिट, नया वीडियो जोड़ें या प्रबंधित करें</span>
           </div>
           <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
             <path d="M9 18l6-6-6-6"></path>
@@ -919,7 +1091,7 @@
       </div>
       
       <p style="font-size: 11px; text-align: center; color: var(--text-muted); margin-top: 16px;">
-        वर्जन 1.0.0 • सिंगल फ़ाइल प्रोडक्शन बिल्ड
+        परा विद्या की पाठशाला • वर्जन 2.0.0
       </p>
     </div>
   </section>
@@ -940,14 +1112,35 @@
     </header>
 
     <div class="content-scrollable">
-      <!-- Add / Edit Form -->
-      <div class="settings-group" style="padding: 16px;">
-        <div class="section-title" id="admin-form-heading" style="margin-bottom: 14px;">नया वीडियो जोड़ें</div>
+      <!-- 1. Layout Edit Section (Top) -->
+      <button id="accordion-btn-layout" class="admin-accordion-btn" onclick="AdminModule.toggleSection('layout')">
+        <span style="display: flex; align-items: center; gap: 8px;">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path></svg>
+          कैप्शन लेआउट एडिट करें (Layout Editor)
+        </span>
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"></polyline></svg>
+      </button>
+      <div id="accordion-content-layout" class="admin-accordion-content">
+        <p style="font-size: 12px; color: var(--text-secondary); margin-bottom: 12px;">वीडियो चुनें जिसे आप लाइव प्लेयर में एडिट (मर्ज, स्प्लिट, वक्ता नाम) करना चाहते हैं:</p>
+        <div id="admin-layout-video-list">
+          <!-- Injected via JS -->
+        </div>
+      </div>
+
+      <!-- 2. Add New Video Form Section (Middle) -->
+      <button id="accordion-btn-form" class="admin-accordion-btn" onclick="AdminModule.toggleSection('form')">
+        <span style="display: flex; align-items: center; gap: 8px;">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="8" x2="12" y2="16"></line><line x1="8" y1="12" x2="16" y2="12"></line></svg>
+          <span id="accordion-form-title">नया वीडियो लिंक जोड़ें (Add Video)</span>
+        </span>
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"></polyline></svg>
+      </button>
+      <div id="accordion-content-form" class="admin-accordion-content">
         <input type="hidden" id="admin-edit-key" value="">
 
         <div class="form-group">
           <label class="form-label" for="admin-title">वीडियो शीर्षक (Title)</label>
-          <input type="text" id="admin-title" class="input-text" placeholder="उदा. गुरुसिया यूनिवर्सल स्टूडियो ध्यान सत्र">
+          <input type="text" id="admin-title" class="input-text" placeholder="उदा. परा विद्या की पाठशाला | एपिसोड - 32">
         </div>
 
         <div class="form-group">
@@ -957,7 +1150,6 @@
 
         <div class="form-group">
           <label class="form-label">कैप्शन डेटा (JSON)</label>
-          
           <div style="display: flex; gap: 8px; margin-bottom: 8px;">
             <input type="file" id="admin-json-file" accept=".json" style="display: none;" onchange="AdminModule.handleFileUpload(event)">
             <button type="button" class="btn btn-secondary" style="flex: 1; padding: 8px;" onclick="document.getElementById('admin-json-file').click()">
@@ -970,7 +1162,6 @@
           </div>
 
           <textarea id="admin-json-text" class="textarea-box" placeholder='[[20.4, 23.4, "ओम"], ...]'></textarea>
-          
           <div id="json-feedback" class="json-validation-status"></div>
         </div>
 
@@ -980,12 +1171,18 @@
         </div>
       </div>
 
-      <!-- Existing Video List -->
-      <div class="section-title-wrap" style="margin-top: 10px;">
-        <div class="section-title">मौजूदा वीडियो (Existing Videos)</div>
-      </div>
-      <div id="admin-video-list">
-        <!-- Injected via JS -->
+      <!-- 3. Existing Video List Section (Bottom) -->
+      <button id="accordion-btn-existing" class="admin-accordion-btn" onclick="AdminModule.toggleSection('existing')">
+        <span style="display: flex; align-items: center; gap: 8px;">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>
+          मौजूदा वीडियो एडिट / डिलीट करें (Existing Videos)
+        </span>
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"></polyline></svg>
+      </button>
+      <div id="accordion-content-existing" class="admin-accordion-content">
+        <div id="admin-video-list">
+          <!-- Injected via JS -->
+        </div>
       </div>
     </div>
   </section>
@@ -1056,8 +1253,10 @@
 
       init() {
         this.applyTheme(this.currentTheme);
-        document.getElementById('theme-select').value = this.currentTheme;
-        document.getElementById('caption-mode-select').value = this.captionMode;
+        this.updateThemeIcons();
+        if (document.getElementById('caption-mode-select')) {
+          document.getElementById('caption-mode-select').value = this.captionMode;
+        }
 
         // Restore screen state
         this.showScreen(this.currentScreen, true);
@@ -1079,19 +1278,29 @@
         FirebaseModule.initListeners();
       },
 
+      toggleTheme() {
+        const nextTheme = this.currentTheme === 'dark' ? 'light' : 'dark';
+        this.setTheme(nextTheme);
+      },
+
       setTheme(theme) {
         this.currentTheme = theme;
         localStorage.setItem('appTheme', theme);
         this.applyTheme(theme);
+        this.updateThemeIcons();
       },
 
       applyTheme(theme) {
-        if (theme === 'system') {
-          const isDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
-          document.documentElement.setAttribute('data-theme', isDark ? 'dark' : 'light');
-        } else {
-          document.documentElement.setAttribute('data-theme', theme);
-        }
+        document.documentElement.setAttribute('data-theme', theme);
+      },
+
+      updateThemeIcons() {
+        const isDark = this.currentTheme === 'dark';
+        const sunIcon = `<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="5"></circle><line x1="12" y1="1" x2="12" y2="3"></line><line x1="12" y1="21" x2="12" y2="23"></line><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line><line x1="1" y1="12" x2="3" y2="12"></line><line x1="21" y1="12" x2="23" y2="12"></line><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line></svg>`;
+        const moonIcon = `<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path></svg>`;
+        document.querySelectorAll('.theme-toggle-btn').forEach(btn => {
+          btn.innerHTML = isDark ? sunIcon : moonIcon;
+        });
       },
 
       setCaptionMode(val) {
@@ -1237,45 +1446,157 @@
     }
 
     /**
-     * Live Caption Sync Engine
+     * Live Caption Sync & In-situ Layout Engine (with Auto-Save)
      */
     const CaptionSyncEngine = {
-      captions: [],
-      currentIndex: -1,
+      blocks: [], // Normalized block structure: [{ speaker: '', lines: [{ start, end, text }] }]
+      isEditMode: false,
+      currentBlockIdx: -1,
+      currentLineIdx: -1,
       syncInterval: null,
       isUserInteracting: false,
       userScrollTimeout: null,
+      autoSaveTimer: null,
 
-      loadCaptions(captionList) {
-        this.captions = captionList || [];
-        this.currentIndex = -1;
+      loadCaptions(captionData) {
+        this.blocks = this.normalizeToBlocks(captionData);
+        this.currentBlockIdx = -1;
+        this.currentLineIdx = -1;
+        this.updateSaveStatus('saved');
         this.renderCaptions();
         this.startSyncLoop();
+      },
+
+      normalizeToBlocks(data) {
+        if (!data || !Array.isArray(data) || data.length === 0) return [];
+        // Check if data is already grouped blocks
+        if (data[0] && data[0].lines && Array.isArray(data[0].lines)) {
+          return JSON.parse(JSON.stringify(data));
+        }
+        // If data is flat array: [{ start, end, text }] or [[start, end, text]]
+        return data.map(item => {
+          if (Array.isArray(item)) {
+            return {
+              speaker: item[3] || '',
+              lines: [{ start: item[0], end: item[1], text: item[2] }]
+            };
+          }
+          return {
+            speaker: item.speaker || '',
+            lines: [{ start: item.start, end: item.end, text: item.text }]
+          };
+        });
+      },
+
+      toggleEditMode() {
+        this.isEditMode = !this.isEditMode;
+        const btn = document.getElementById('btn-player-edit-toggle');
+        if (btn) {
+          btn.classList.toggle('active-mode', this.isEditMode);
+        }
+        this.renderCaptions();
+        App.showToast(this.isEditMode ? 'एडिट मोड चालू (सीधा टेक्स्ट पर क्लिक करके सुधारें)' : 'एडिट मोड बंद हुआ');
+      },
+
+      triggerAutoSave() {
+        if (!App.currentVideo || !App.currentVideo.key) return;
+        this.updateSaveStatus('saving');
+        clearTimeout(this.autoSaveTimer);
+        this.autoSaveTimer = setTimeout(() => {
+          this.executeAutoSave();
+        }, 1200); // 1.2 सेकंड का ऑटो-सेव डिबाउंस
+      },
+
+      executeAutoSave() {
+        const videoKey = App.currentVideo.key;
+        videosRef.child(videoKey).update({
+          captions: this.blocks,
+          updatedAt: Date.now()
+        }).then(() => {
+          App.currentVideo.captions = this.blocks;
+          localStorage.setItem('lastVideo', JSON.stringify(App.currentVideo));
+          this.updateSaveStatus('saved');
+        }).catch(err => {
+          this.updateSaveStatus('error');
+          App.showToast('ऑटो-सेव में त्रुटि: ' + err.message);
+        });
+      },
+
+      updateSaveStatus(status) {
+        const el = document.getElementById('autosave-status');
+        if (!el) return;
+        if (status === 'saving') {
+          el.className = 'autosave-pill saving';
+          el.textContent = '⏳ सेव हो रहा है...';
+        } else if (status === 'saved') {
+          el.className = 'autosave-pill saved';
+          el.textContent = '✓ सुरक्षित';
+        } else if (status === 'error') {
+          el.className = 'autosave-pill saving';
+          el.textContent = '⚠️ सेव विफल';
+        }
       },
 
       renderCaptions() {
         const container = document.getElementById('captions-container');
         container.innerHTML = '';
 
-        if (!this.captions || this.captions.length === 0) {
+        if (!this.blocks || this.blocks.length === 0) {
           container.innerHTML = `<div class="empty-box">इस वीडियो के लिए कोई कैप्शन उपलब्ध नहीं है।</div>`;
           return;
         }
 
-        this.captions.forEach((cap, idx) => {
+        let totalLines = 0;
+        this.blocks.forEach((block, bIdx) => {
           const card = document.createElement('div');
           card.className = 'caption-card';
-          card.id = `caption-item-${idx}`;
-          card.onclick = () => this.seekToCaption(cap.start);
+          card.id = `caption-block-${bIdx}`;
 
-          const timeFormatted = `${this.formatTime(cap.start)} - ${this.formatTime(cap.end)}`;
-          card.innerHTML = `
+          const firstLine = block.lines[0];
+          const lastLine = block.lines[block.lines.length - 1];
+          const timeFormatted = `${this.formatTime(firstLine.start)} - ${this.formatTime(lastLine.end)}`;
+
+          let headerHTML = `
             <div class="caption-timestamp">
               <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>
               ${timeFormatted}
             </div>
-            <div>${this.escapeHTML(cap.text)}</div>
           `;
+
+          if (this.isEditMode) {
+            // Edit Mode UI
+            headerHTML += `
+              <input type="text" class="speaker-input" placeholder="👤 वक्ता का नाम लिखें (उदा. गुरुदेव, साधक)..." value="${this.escapeHTML(block.speaker || '')}" oninput="CaptionSyncEngine.setSpeaker(${bIdx}, this.value)">
+            `;
+
+            let linesHTML = block.lines.map((l, lIdx) => {
+              return `<span contenteditable="true" class="caption-line editable-line" oninput="CaptionSyncEngine.updateLineText(${bIdx}, ${lIdx}, this.innerText)">${this.escapeHTML(l.text.trim())}</span>`;
+            }).join(' ');
+
+            let actionsHTML = `<div class="caption-edit-bar">`;
+            if (bIdx > 0) {
+              actionsHTML += `<button type="button" class="btn-mini" onclick="CaptionSyncEngine.mergeBlockWithPrevious(${bIdx})">⬆️ ऊपर जोड़ें (Merge)</button>`;
+            }
+            if (block.lines.length > 1) {
+              actionsHTML += `<button type="button" class="btn-mini" onclick="CaptionSyncEngine.splitBlock(${bIdx})">✂️ अलग करें (Split)</button>`;
+            }
+            actionsHTML += `</div>`;
+
+            card.innerHTML = headerHTML + `<div>${linesHTML}</div>` + actionsHTML;
+          } else {
+            // Normal Viewer Mode UI
+            if (block.speaker && block.speaker.trim()) {
+              headerHTML += `<div class="speaker-badge">👤 ${this.escapeHTML(block.speaker)}</div>`;
+            }
+
+            let linesHTML = block.lines.map((l, lIdx) => {
+              totalLines++;
+              return `<span id="caption-line-${bIdx}-${lIdx}" class="caption-line" onclick="CaptionSyncEngine.seekToCaption(${l.start})">${this.escapeHTML(l.text.trim())}</span>`;
+            }).join(' ');
+
+            card.innerHTML = headerHTML + `<div>${linesHTML}</div>`;
+          }
+
           container.appendChild(card);
         });
 
@@ -1287,6 +1608,54 @@
             this.isUserInteracting = false;
           }, 3000);
         };
+      },
+
+      updateLineText(bIdx, lIdx, newText) {
+        if (this.blocks[bIdx] && this.blocks[bIdx].lines[lIdx]) {
+          this.blocks[bIdx].lines[lIdx].text = newText.trim();
+          this.triggerAutoSave();
+        }
+      },
+
+      setSpeaker(bIdx, name) {
+        if (this.blocks[bIdx]) {
+          this.blocks[bIdx].speaker = name.trim();
+          this.triggerAutoSave();
+        }
+      },
+
+      mergeBlockWithPrevious(bIdx) {
+        if (bIdx <= 0 || !this.blocks[bIdx]) return;
+        const currentBlock = this.blocks[bIdx];
+        const prevBlock = this.blocks[bIdx - 1];
+
+        // Merge lines into previous block
+        prevBlock.lines = prevBlock.lines.concat(currentBlock.lines);
+        
+        // Remove current block
+        this.blocks.splice(bIdx, 1);
+        this.renderCaptions();
+        this.triggerAutoSave();
+        App.showToast('लाइन ऊपर जोड़ दी गई!');
+      },
+
+      splitBlock(bIdx) {
+        if (!this.blocks[bIdx] || this.blocks[bIdx].lines.length <= 1) return;
+        const block = this.blocks[bIdx];
+        const speaker = block.speaker;
+        const lines = [...block.lines];
+
+        // Create individual blocks for each line
+        const newBlocks = lines.map(line => ({
+          speaker: speaker,
+          lines: [line]
+        }));
+
+        // Replace the single block with multiple individual blocks
+        this.blocks.splice(bIdx, 1, ...newBlocks);
+        this.renderCaptions();
+        this.triggerAutoSave();
+        App.showToast('लाइनों को अलग-अलग कर दिया गया!');
       },
 
       startSyncLoop() {
@@ -1304,46 +1673,55 @@
           return;
         }
 
-        const activeIndex = this.findActiveCaptionIndex(currentTime);
+        const match = this.findActiveIndices(currentTime);
 
-        if (activeIndex !== this.currentIndex) {
-          this.currentIndex = activeIndex;
-          this.updateActiveUI(activeIndex);
+        if (match.blockIdx !== this.currentBlockIdx || match.lineIdx !== this.currentLineIdx) {
+          this.currentBlockIdx = match.blockIdx;
+          this.currentLineIdx = match.lineIdx;
+          this.updateActiveUI(match.blockIdx, match.lineIdx);
         }
       },
 
-      findActiveCaptionIndex(time) {
-        for (let i = 0; i < this.captions.length; i++) {
-          if (time >= this.captions[i].start && time < this.captions[i].end) {
-            return i;
+      findActiveIndices(time) {
+        for (let b = 0; b < this.blocks.length; b++) {
+          const block = this.blocks[b];
+          for (let l = 0; l < block.lines.length; l++) {
+            const line = block.lines[l];
+            if (time >= line.start && time < line.end) {
+              return { blockIdx: b, lineIdx: l };
+            }
           }
         }
-        return -1;
+        return { blockIdx: -1, lineIdx: -1 };
       },
 
-      updateActiveUI(index) {
-        // Remove prior active classes
+      updateActiveUI(bIdx, lIdx) {
+        // Clear prior active classes
         document.querySelectorAll('.caption-card.active').forEach(el => el.classList.remove('active'));
+        document.querySelectorAll('.caption-line.active-line').forEach(el => el.classList.remove('active-line'));
 
         const badge = document.getElementById('caption-count-badge');
-        if (index === -1) {
-          badge.textContent = `- / ${this.captions.length}`;
+        if (bIdx === -1) {
+          badge.textContent = `- / ${this.blocks.length}`;
           return;
         }
 
-        badge.textContent = `${index + 1} / ${this.captions.length}`;
-        const activeCard = document.getElementById(`caption-item-${index}`);
-        
+        badge.textContent = `${bIdx + 1} / ${this.blocks.length}`;
+        const activeCard = document.getElementById(`caption-block-${bIdx}`);
+        const activeLine = document.getElementById(`caption-line-${bIdx}-${lIdx}`);
+
         if (activeCard) {
           activeCard.classList.add('active');
-
-          // Smooth centering scroll unless user is actively dragging
-          if (!this.isUserInteracting) {
+          if (!this.isUserInteracting && !this.isEditMode) {
             activeCard.scrollIntoView({
               behavior: 'smooth',
               block: 'center'
             });
           }
+        }
+
+        if (activeLine) {
+          activeLine.classList.add('active-line');
         }
       },
 
@@ -1362,6 +1740,7 @@
       },
 
       escapeHTML(str) {
+        if (!str) return '';
         const div = document.createElement('div');
         div.textContent = str;
         return div.innerHTML;
@@ -1479,6 +1858,38 @@
     const AdminModule = {
       pendingDeleteKey: null,
 
+      toggleSection(sectionId) {
+        const sections = ['layout', 'form', 'existing'];
+        sections.forEach(id => {
+          const btn = document.getElementById(`accordion-btn-${id}`);
+          const content = document.getElementById(`accordion-content-${id}`);
+          if (id === sectionId) {
+            const isOpen = content.classList.contains('open');
+            if (isOpen) {
+              content.classList.remove('open');
+              btn.classList.remove('active');
+            } else {
+              content.classList.add('open');
+              btn.classList.add('active');
+            }
+          }
+        });
+      },
+
+      openLayoutEditor(key) {
+        const v = FirebaseModule.videos[key];
+        if (!v) return;
+        App.currentVideo = { key, ...v };
+        localStorage.setItem('lastVideo', JSON.stringify(App.currentVideo));
+        document.getElementById('player-screen-title').textContent = v.title;
+        App.navigateTo('player');
+        initYouTubePlayer(v.youtubeId);
+        CaptionSyncEngine.loadCaptions(v.captions);
+        CaptionSyncEngine.isEditMode = true;
+        CaptionSyncEngine.renderCaptions();
+        App.showToast('🎨 लेआउट एडिटर चालू हुआ');
+      },
+
       handleFileUpload(event) {
         const file = event.target.files[0];
         if (!file) return;
@@ -1591,36 +2002,59 @@
 
       renderAdminList(videosObj) {
         const container = document.getElementById('admin-video-list');
-        container.innerHTML = '';
+        const layoutContainer = document.getElementById('admin-layout-video-list');
+        if (container) container.innerHTML = '';
+        if (layoutContainer) layoutContainer.innerHTML = '';
 
         const keys = Object.keys(videosObj);
         if (keys.length === 0) {
-          container.innerHTML = `<p style="font-size: 13px; color: var(--text-muted);">कोई वीडियो उपलब्ध नहीं है।</p>`;
+          if (container) container.innerHTML = `<p style="font-size: 13px; color: var(--text-muted);">कोई वीडियो उपलब्ध नहीं है।</p>`;
+          if (layoutContainer) layoutContainer.innerHTML = `<p style="font-size: 13px; color: var(--text-muted);">कोई वीडियो उपलब्ध नहीं है।</p>`;
           return;
         }
 
         keys.forEach(key => {
           const v = videosObj[key];
-          const item = document.createElement('div');
-          item.className = 'admin-video-item';
-
           const thumb = YouTubeUtils.getThumbnail(v.youtubeId);
-          item.innerHTML = `
-            <img src="${thumb}" class="admin-item-thumb" alt="">
-            <div class="admin-item-info">
-              <div class="admin-item-title">${CaptionSyncEngine.escapeHTML(v.title)}</div>
-              <div class="admin-item-sub">ID: ${v.youtubeId}</div>
-            </div>
-            <div class="admin-actions">
-              <button class="icon-btn" onclick="AdminModule.editVideo('${key}')" title="बदलें">
-                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path></svg>
-              </button>
-              <button class="icon-btn" style="color: var(--danger);" onclick="AdminModule.promptDelete('${key}')" title="हटाएं">
-                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg>
-              </button>
-            </div>
-          `;
-          container.appendChild(item);
+
+          // 1. Render in Layout Editor List
+          if (layoutContainer) {
+            const layoutItem = document.createElement('div');
+            layoutItem.className = 'admin-video-item';
+            layoutItem.style.cursor = 'pointer';
+            layoutItem.onclick = () => AdminModule.openLayoutEditor(key);
+            layoutItem.innerHTML = `
+              <img src="${thumb}" class="admin-item-thumb" alt="">
+              <div class="admin-item-info">
+                <div class="admin-item-title">${CaptionSyncEngine.escapeHTML(v.title)}</div>
+                <div class="admin-item-sub" style="color: var(--primary); font-weight: 600;">✎ लेआउट / कैप्शन एडिट करें</div>
+              </div>
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 18l6-6-6-6"></path></svg>
+            `;
+            layoutContainer.appendChild(layoutItem);
+          }
+
+          // 2. Render in Existing Manage List
+          if (container) {
+            const item = document.createElement('div');
+            item.className = 'admin-video-item';
+            item.innerHTML = `
+              <img src="${thumb}" class="admin-item-thumb" alt="">
+              <div class="admin-item-info">
+                <div class="admin-item-title">${CaptionSyncEngine.escapeHTML(v.title)}</div>
+                <div class="admin-item-sub">ID: ${v.youtubeId}</div>
+              </div>
+              <div class="admin-actions">
+                <button class="icon-btn" onclick="AdminModule.editVideo('${key}')" title="बदलें">
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path></svg>
+                </button>
+                <button class="icon-btn" style="color: var(--danger);" onclick="AdminModule.promptDelete('${key}')" title="हटाएं">
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg>
+                </button>
+              </div>
+            `;
+            container.appendChild(item);
+          }
         });
       },
 
@@ -1628,18 +2062,31 @@
         const v = FirebaseModule.videos[key];
         if (!v) return;
 
+        // Open form section if closed
+        const formContent = document.getElementById('accordion-content-form');
+        const formBtn = document.getElementById('accordion-btn-form');
+        if (formContent && !formContent.classList.contains('open')) {
+          formContent.classList.add('open');
+          if (formBtn) formBtn.classList.add('active');
+        }
+
         document.getElementById('admin-edit-key').value = key;
         document.getElementById('admin-title').value = v.title;
         document.getElementById('admin-yt-url').value = `https://youtu.be/${v.youtubeId}`;
         
         // Reconstruct array format for editor
-        const rawArray = (v.captions || []).map(c => [c.start, c.end, c.text]);
-        document.getElementById('admin-json-text').value = JSON.stringify(rawArray, null, 2);
+        const rawArray = (v.captions || []).map(c => {
+          if (c.lines) {
+            return c.lines.map(l => [l.start, l.end, l.text, c.speaker || '']);
+          }
+          return [c.start, c.end, c.text];
+        }).flat();
 
-        document.getElementById('admin-form-heading').textContent = 'वीडियो संपादित करें (Edit Video)';
+        document.getElementById('admin-json-text').value = JSON.stringify(rawArray, null, 2);
+        document.getElementById('accordion-form-title').textContent = 'वीडियो संपादित करें (Edit Video)';
         document.getElementById('admin-cancel-btn').style.display = 'inline-flex';
         this.validateFromUI();
-        window.scrollTo({ top: 0, behavior: 'smooth' });
+        formContent.scrollIntoView({ behavior: 'smooth', block: 'start' });
       },
 
       resetForm() {
@@ -1647,7 +2094,7 @@
         document.getElementById('admin-title').value = '';
         document.getElementById('admin-yt-url').value = '';
         document.getElementById('admin-json-text').value = '';
-        document.getElementById('admin-form-heading').textContent = 'नया वीडियो जोड़ें';
+        document.getElementById('accordion-form-title').textContent = 'नया वीडियो लिंक जोड़ें (Add Video)';
         document.getElementById('admin-cancel-btn').style.display = 'none';
         document.getElementById('json-feedback').className = 'json-validation-status';
         document.getElementById('json-feedback').style.display = 'none';
